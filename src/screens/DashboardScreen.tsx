@@ -2,7 +2,7 @@ import { Text, View, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useMemo } from 'react';
 
-import { EChartWrapper } from '../components/EChartWrapper';
+import { EChartWrapper } from '../components/common/EChartWrapper';
 
 export const DashboardScreen = () => {
   const mockHabits = [

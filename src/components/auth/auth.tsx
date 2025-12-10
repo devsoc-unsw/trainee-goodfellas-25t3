@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Alert, StyleSheet, View, AppState, Button } from 'react-native'
-import { supabase } from '../lib/supabase'
+import { supabase } from '../utils/supabase'
 import { TextInput } from 'react-native-gesture-handler'
 
 // Tells Supabase Auth to continuously refresh the session automatically if

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { supabase } from '../utils/supabase'
 import { StyleSheet, View, Alert, Button } from 'react-native'
 import { Session } from '@supabase/supabase-js'
 import { TextInput } from 'react-native-gesture-handler'

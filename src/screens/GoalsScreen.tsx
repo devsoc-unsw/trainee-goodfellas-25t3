@@ -1,6 +1,6 @@
 import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { CreateGoal } from '../components/CreateGoal';
+import { CreateGoal } from '../components/goals/CreateGoal';
 
 export const GoalsScreen = () => {
   return (

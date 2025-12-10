@@ -9,10 +9,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { useHabitsStore } from './src/store/useHabitsStore';
-import { supabase } from './src/lib/supabase'
+import { supabase } from './src/utils/supabase'
 import { Session } from '@supabase/supabase-js'
-import Account from './src/components/account';
-import Auth from './src/components/auth';
+import Account from './src/components/auth/account';
+import Auth from './src/components/auth/auth';
 
 export default function App() {
   const themePalette = useHabitsStore((state) => state.theme.palette);
