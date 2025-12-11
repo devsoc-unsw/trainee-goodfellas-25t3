@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../utils/supabase'
 import { StyleSheet, View, Alert, Button } from 'react-native'
-import { Session } from '@supabase/supabase-js'
+import { useSession } from '../../contexts/SessionContext'
 import { TextInput } from 'react-native-gesture-handler'
 
-export default function Account({ session }: { session: Session }) {
+export default function Account() {
+  const { session } = useSession()
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState('')
-  const [website, setWebsite] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
 
   useEffect(() => {
@@ -30,7 +30,6 @@ export default function Account({ session }: { session: Session }) {
 
       if (data) {
         setUsername(data.username)
-        setWebsite(data.website)
         setAvatarUrl(data.avatar_url)
       }
     } catch (error) {
@@ -44,11 +43,9 @@ export default function Account({ session }: { session: Session }) {
 
   async function updateProfile({
     username,
-    website,
     avatar_url,
   }: {
     username: string
-    website: string
     avatar_url: string
   }) {
     try {
@@ -58,7 +55,6 @@ export default function Account({ session }: { session: Session }) {
       const updates = {
         id: session?.user.id,
         username,
-        website,
         avatar_url,
         updated_at: new Date(),
       }
@@ -78,43 +74,36 @@ export default function Account({ session }: { session: Session }) {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <TextInput placeholder="Email" value={session?.user?.email} editable={false} />
+    <View className='gap-2'>
+      <View>
+        <TextInput 
+          className="w-72 h-12 px-4 rounded-lg bg-neutral-900 text-gray-400 border border-neutral-700" 
+          placeholder="Email" 
+          value={session?.user?.email} 
+          editable={false} 
+          placeholderTextColor='#ccc'
+        />
       </View>
-      <View style={styles.verticallySpaced}>
-        <TextInput placeholder="Username" value={username || ''} onChangeText={setUsername} />
+      <View>
+        <TextInput 
+          className="w-72 h-12 px-4 rounded-lg bg-neutral-900 text-white border border-neutral-700"
+          placeholder="Username" 
+          value={username || ''} 
+          onChangeText={setUsername} 
+          placeholderTextColor='#ccc'
+        />
       </View>
-      <View style={styles.verticallySpaced}>
-        <TextInput placeholder="Website" value={website || ''} onChangeText={setWebsite} />
-      </View>
-
-      <View style={[styles.verticallySpaced, styles.mt20]}>
+      <View>
         <Button
           title={loading ? 'Loading ...' : 'Update'}
-          onPress={() => updateProfile({ username, website, avatar_url: avatarUrl })}
+          onPress={() => updateProfile({ username, avatar_url: avatarUrl })}
           disabled={loading}
         />
       </View>
 
-      <View style={styles.verticallySpaced}>
+      <View>
         <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
       </View>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 40,
-    padding: 12,
-  },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
-  },
-  mt20: {
-    marginTop: 20,
-  },
-})

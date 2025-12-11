@@ -47,46 +47,35 @@ export default function Auth() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
+    <View className="flex-1 justify-center items-center gap-2">
+      <View>
         <TextInput
             placeholder="Enter your email"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+            placeholderTextColor="#ccc"
+            className="w-72 h-12 px-4 rounded-lg bg-neutral-900 text-white border border-neutral-700"
         />
       </View>
-      <View style={styles.verticallySpaced}>
+      <View>
         <TextInput
             placeholder="Enter your password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry={true}
             autoCapitalize="none"
+            placeholderTextColor="#ccc"
+            className="w-72 h-12 px-4 rounded-lg bg-neutral-900 text-white border border-neutral-700"
         />
       </View>
-      <View className="text-white" style={[styles.verticallySpaced, styles.mt20]}>
-        <Button title="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
+      <View className="w-72 mt-2">
+        <Button  title="Sign in" disabled={loading} onPress={() => signInWithEmail()} />
       </View>
-      <View  className="text-white" style={styles.verticallySpaced}>
+      <View className="w-72 mt-2">
         <Button title="Sign up" disabled={loading} onPress={() => signUpWithEmail()} />
       </View>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginTop: 40,
-    padding: 12,
-  },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
-  },
-  mt20: {
-    marginTop: 20,
-  },
-})

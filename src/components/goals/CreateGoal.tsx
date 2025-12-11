@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { supabase } from '../../utils/supabase'
 import { Button, TextInput, View, Text, StyleSheet } from 'react-native';
+import { useSession } from '../../contexts/SessionContext';
 
 export const CreateGoal = () => {
+  const { session } = useSession()
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [hours, setHours] = useState("");
@@ -15,6 +18,11 @@ export const CreateGoal = () => {
       return;
     }
 
+    if (!session?.user) {
+      setError("Must be logged in to create a goal.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -22,6 +30,7 @@ export const CreateGoal = () => {
       .from("goals")
       .insert([
         {
+          user_id: session.user.id,
           name,
           description: description || null,
           hours: parseInt(hours, 10),
@@ -34,7 +43,6 @@ export const CreateGoal = () => {
       setError(error.message);
       console.error(error);
     } else {
-      console.log("Goal created:", data);
       setName("");
       setDescription("");
       setHours("");
@@ -42,23 +50,23 @@ export const CreateGoal = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View className='gap-4'>
       <TextInput
-        style={styles.input}
+        className="w-72 h-12 px-4 rounded-lg bg-neutral-900 text-white border border-neutral-700"
         placeholder="Goal Name"
         placeholderTextColor='#888'
         value={name}
         onChangeText={setName}
       />
       <TextInput
-        style={styles.input}
+        className="w-72 h-12 px-4 rounded-lg bg-neutral-900 text-white border border-neutral-700"
         placeholder="Description (optional)"
         placeholderTextColor='#888'
         value={description}
         onChangeText={setDescription}
       />
       <TextInput
-        style={styles.input}
+        className="w-72 h-12 px-4 rounded-lg bg-neutral-900 text-white border border-neutral-700"
         placeholder="Hours"
         value={hours}
         placeholderTextColor='#888'
@@ -70,27 +78,7 @@ export const CreateGoal = () => {
         onPress={handleCreateGoal}
         disabled={loading}
       />
-      {error && <Text style={styles.error}>{error}</Text>}
+      {error && <Text className='text-red-500'>{error}</Text>}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    marginBottom: 15,
-    borderRadius: 5,
-    color: '#fff',
-  },
-  error: {
-    color: "red",
-    marginTop: 10,
-  },
-});
