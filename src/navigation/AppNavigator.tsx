@@ -52,8 +52,8 @@ export const AppNavigator = () => (
       })}
     >
       <Tab.Screen name="HomePage" options={{ tabBarLabel: "Home Page"}} component={DashboardScreen} />
-      <Tab.Screen name="CreateGoals" options={{ tabBarLabel: "Create Goals"}} component={TimerScreen} />
-      <Tab.Screen name="ListOfHabits" options={{ tabBarLabel: "List of Habits"}} component={GoalsScreen} />
+      <Tab.Screen name="CreateGoals" options={{ tabBarLabel: "Create Goals"}} component={GoalsScreen} />
+      <Tab.Screen name="ListOfHabits" options={{ tabBarLabel: "List of Habits"}} component={TimerScreen} />
       <Tab.Screen name="UserProfile" options={{ tabBarLabel: "User Profile"}} component={SettingsScreen} />
     </Tab.Navigator>
   </NavigationContainer>
