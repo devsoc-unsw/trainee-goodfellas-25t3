@@ -8,10 +8,10 @@ import { SettingsScreen } from '../screens/SettingsScreen';
 import { TimerScreen } from '../screens/TimerScreen';
 
 export type RootTabParamList = {
-  Dashboard: undefined;
-  Timer: undefined;
-  Goals: undefined;
-  Settings: undefined;
+  HomePage: undefined;
+  CreateGoals: undefined;
+  ListOfHabits: undefined;
+  UserProfile: undefined;
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -29,10 +29,10 @@ const navTheme: Theme = {
 };
 
 const iconMap: Record<keyof RootTabParamList, keyof typeof Ionicons.glyphMap> = {
-  Dashboard: 'stats-chart',
-  Timer: 'timer',
-  Goals: 'flag',
-  Settings: 'settings',
+  HomePage: 'home',
+  CreateGoals: 'star',
+  ListOfHabits: 'list',
+  UserProfile: 'person',
 };
 
 export const AppNavigator = () => (
@@ -51,10 +51,10 @@ export const AppNavigator = () => (
         ),
       })}
     >
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Timer" component={TimerScreen} />
-      <Tab.Screen name="Goals" component={GoalsScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name="HomePage" options={{ tabBarLabel: "Home Page"}} component={DashboardScreen} />
+      <Tab.Screen name="CreateGoals" options={{ tabBarLabel: "Create Goals"}} component={TimerScreen} />
+      <Tab.Screen name="ListOfHabits" options={{ tabBarLabel: "List of Habits"}} component={GoalsScreen} />
+      <Tab.Screen name="UserProfile" options={{ tabBarLabel: "User Profile"}} component={SettingsScreen} />
     </Tab.Navigator>
   </NavigationContainer>
 );
