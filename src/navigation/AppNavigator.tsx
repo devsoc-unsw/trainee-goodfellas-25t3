@@ -6,6 +6,7 @@ import { DashboardScreen } from '../screens/DashboardScreen';
 import { GoalsScreen } from '../screens/GoalsScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { TimerScreen } from '../screens/TimerScreen';
+import { HabitsScreen } from '../screens/HabitsScreen';
 
 export type RootTabParamList = {
   HomePage: undefined;
@@ -53,7 +54,7 @@ export const AppNavigator = () => (
     >
       <Tab.Screen name="HomePage" options={{ tabBarLabel: "Home Page"}} component={DashboardScreen} />
       <Tab.Screen name="CreateGoals" options={{ tabBarLabel: "Create Goals"}} component={GoalsScreen} />
-      <Tab.Screen name="ListOfHabits" options={{ tabBarLabel: "List of Habits"}} component={TimerScreen} />
+      <Tab.Screen name="ListOfHabits" options={{ tabBarLabel: "List of Habits"}} component={HabitsScreen} />
       <Tab.Screen name="UserProfile" options={{ tabBarLabel: "User Profile"}} component={SettingsScreen} />
     </Tab.Navigator>
   </NavigationContainer>
