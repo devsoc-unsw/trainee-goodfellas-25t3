@@ -3,13 +3,14 @@ import { supabase } from '../../utils/supabase'
 import { useSession } from '../../contexts/SessionContext';
 import { Habit } from '../../types/habit'
 import Dropdown from 'react-native-input-select';
+import { TSelectedItem } from 'react-native-input-select/lib/typescript/src/types/index.types';
 
 // used for the dropdown to select a habit in goals menu
 
 export const SelectHabit = () => {
   const { session } = useSession();
   const [ dropdownOpts, setDropdownOpts ] = useState<{label:string; value:number;}[]>([]);
-  const [ selectedOpt, setSelected ] = useState();
+  const [ selectedOpt, setSelected ] = useState<TSelectedItem|TSelectedItem[]>();
   const [ loading, setLoading] = useState(false);
   const [ error, setError ] = useState<string | null>(null);
 
@@ -43,7 +44,7 @@ export const SelectHabit = () => {
   return (
     <>
       <Dropdown
-        // FIXME: this doesn't render right D: also theres a typeerror
+        // FIXME: this doesn't render right D:
         placeholder='Select a habit...'
         options={dropdownOpts}
         selectedValue={selectedOpt}
