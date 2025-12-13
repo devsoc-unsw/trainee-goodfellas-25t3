@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '../../utils/supabase'
 import { Button, TextInput, View, Text, StyleSheet } from 'react-native';
 import { useSession } from '../../contexts/SessionContext';
+import { SelectHabit } from './HabitSelector';
 
 export const CreateGoal = () => {
   const { session } = useSession()
@@ -79,6 +80,7 @@ export const CreateGoal = () => {
         onPress={handleCreateGoal}
         disabled={loading}
       />
+      <SelectHabit/>
       {error && <Text className='text-red-500'>{error}</Text>}
     </View>
   );

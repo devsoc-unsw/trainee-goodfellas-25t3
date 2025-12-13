@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../utils/supabase'
-import { Button, TextInput, View, Text, StyleSheet } from 'react-native';
 import { useSession } from '../../contexts/SessionContext';
 import { Habit } from '../../types/habit'
-import { SelectableOption } from '../common/SelectableOption';
+import Dropdown from 'react-native-input-select';
 
 // used for the dropdown to select a habit in goals menu
 
 export const SelectHabit = () => {
   const { session } = useSession();
-  const [ dropdownOpts, setDropdownOpts ] = useState<Habit[]>([]);
+  const [ dropdownOpts, setDropdownOpts ] = useState<{label:string; value:number;}[]>([]);
+  const [ selectedOpt, setSelected ] = useState();
   const [ loading, setLoading] = useState(false);
   const [ error, setError ] = useState<string | null>(null);
 
@@ -31,18 +31,28 @@ export const SelectHabit = () => {
       setError(error.message);
       console.error(error);
     } else {
-      setDropdownOpts(data);
+      setDropdownOpts(data.map((e:Habit) => { return {label: e.name, value: e.id} }));
     }
   }
 
-  // on page render, fetch dropdown options
+  // FIXME: need to rerender options when habits are updated as well
   useEffect(() => {
     fetchHabits();
   }, [])
 
   return (
     <>
-      { dropdownOpts.map((o) => (<SelectableOption key={o.id} optName={o.name}/>))}
+      <Dropdown
+        // FIXME: this doesn't render right D: also theres a typeerror
+        placeholder='Select a habit...'
+        options={dropdownOpts}
+        selectedValue={selectedOpt}
+        onValueChange={(value) => setSelected(value)}
+        primaryColor={'blue'}
+        placeholderStyle={{color:'#888', fontSize:18, fontWeight: 300}}
+        selectedItemStyle={{color:'white', fontSize:18, fontWeight: 300}}
+        dropdownContainerStyle={{borderColor:'#404040', backgroundColor:'#404040'}}
+      />
     </>
   )
 }
