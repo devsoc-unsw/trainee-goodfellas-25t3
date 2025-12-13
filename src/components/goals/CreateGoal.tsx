@@ -10,10 +10,16 @@ export const CreateGoal = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [hours, setHours] = useState("");
+  const [selectedHabit, setHabit] = useState<number|null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleCreateGoal = async () => {
+    if (!selectedHabit) {
+      setError('Please select a habit.');
+      return;
+    }
+
     if (!name || !hours) {
       setError("Name and hours are required.");
       return;
@@ -26,13 +32,11 @@ export const CreateGoal = () => {
 
     setLoading(true);
     setError(null);
-
     const { data, error } = await supabase
       .from("goals")
       .insert([
         {
-          // FIXME: set this to selected habit when dropdown is done
-          habit_id: null,
+          habit_id: selectedHabit,
           name,
           description: description || null,
           hours_required: parseInt(hours, 10),
@@ -50,6 +54,10 @@ export const CreateGoal = () => {
       setHours("");
     }
   };
+
+  function getSelectedHabit(habitId:number) {
+    setHabit(habitId);
+  }
 
   return (
     <View className='gap-4'>
@@ -80,7 +88,7 @@ export const CreateGoal = () => {
         onPress={handleCreateGoal}
         disabled={loading}
       />
-      <SelectHabit/>
+      <SelectHabit setSelected={getSelectedHabit}/>
       {error && <Text className='text-red-500'>{error}</Text>}
     </View>
   );

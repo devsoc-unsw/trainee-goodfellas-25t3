@@ -3,15 +3,13 @@ import { supabase } from '../../utils/supabase'
 import { useSession } from '../../contexts/SessionContext';
 import { Habit } from '../../types/habit'
 import Dropdown from 'react-native-input-select';
-import { TSelectedItem } from 'react-native-input-select/lib/typescript/src/types/index.types';
 
 // used for the dropdown to select a habit in goals menu
 
-export const SelectHabit = () => {
+export const SelectHabit = (props: {setSelected:(habitId:number)=>void}) => {
   const { session } = useSession();
   const [ dropdownOpts, setDropdownOpts ] = useState<{label:string; value:number;}[]>([]);
-  const [ selectedOpt, setSelected ] = useState<TSelectedItem|TSelectedItem[]>();
-  const [ loading, setLoading] = useState(false);
+  const [ selectedOpt, setSelected ] = useState<number>();
   const [ error, setError ] = useState<string | null>(null);
 
   async function fetchHabits() {
@@ -20,14 +18,12 @@ export const SelectHabit = () => {
       return;
     }
 
-    setLoading(true);
     setError(null);
 
     const { data, error } = await supabase
       .from('habits')
       .select('*');
 
-    setLoading(false);
     if (error) {
       setError(error.message);
       console.error(error);
@@ -48,7 +44,10 @@ export const SelectHabit = () => {
         placeholder='Select a habit...'
         options={dropdownOpts}
         selectedValue={selectedOpt}
-        onValueChange={(value) => setSelected(value)}
+        onValueChange={(value) => {
+          setSelected(value as number);
+          props.setSelected(value as number);
+        }}
         primaryColor={'blue'}
         placeholderStyle={{color:'#888', fontSize:18, fontWeight: 300}}
         selectedItemStyle={{color:'white', fontSize:18, fontWeight: 300}}
