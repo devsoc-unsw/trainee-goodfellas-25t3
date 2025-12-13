@@ -30,10 +30,11 @@ export const CreateGoal = () => {
       .from("goals")
       .insert([
         {
-          user_id: session.user.id,
+          // FIXME: set this to selected habit when dropdown is done
+          habit_id: null,
           name,
           description: description || null,
-          hours: parseInt(hours, 10),
+          hours_required: parseInt(hours, 10),
         },
       ]);
 
