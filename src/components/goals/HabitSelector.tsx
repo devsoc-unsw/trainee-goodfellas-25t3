@@ -3,6 +3,7 @@ import { supabase } from '../../utils/supabase'
 import { Button, TextInput, View, Text, StyleSheet } from 'react-native';
 import { useSession } from '../../contexts/SessionContext';
 import { Habit } from '../../types/habit'
+import { SelectableOption } from '../common/SelectableOption';
 
 // used for the dropdown to select a habit in goals menu
 
@@ -23,7 +24,7 @@ export const SelectHabit = () => {
 
     const { data, error } = await supabase
       .from('habits')
-      .select('id, name');
+      .select('*');
 
     setLoading(false);
     if (error) {
@@ -34,11 +35,14 @@ export const SelectHabit = () => {
     }
   }
 
-
   // on page render, fetch dropdown options
   useEffect(() => {
     fetchHabits();
   }, [])
 
-  // TODO: use dropdownOpts in a dropdown component for user to select
+  return (
+    <>
+      { dropdownOpts.map((o) => (<SelectableOption key={o.id} optName={o.name}/>))}
+    </>
+  )
 }
