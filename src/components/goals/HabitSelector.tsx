@@ -83,7 +83,7 @@ export const SelectHabit = ({ setSelected, refreshTrigger }: SelectHabitProps) =
 
   return (
     <>
-      <Picker
+      {/* <Picker
         selectedValue={selectedOpt}
         onValueChange={(val:number) => {
           setSelectedOpt(val as number);
@@ -101,9 +101,8 @@ export const SelectHabit = ({ setSelected, refreshTrigger }: SelectHabitProps) =
             paddingHorizontal: 16,
         }}>
         { dropdownOpts.map((o) => (<PickerItem label={o.label} value={o.value}/>))}
-      </Picker>
-      {/* FIXME: i swapped the package but it is still ugly i am sorry... */}
-      {/* <Dropdown
+      </Picker> */}
+      <Dropdown
         placeholder='Select a habit...'
         options={dropdownOpts}
         selectedValue={selectedOpt}
@@ -142,7 +141,7 @@ export const SelectHabit = ({ setSelected, refreshTrigger }: SelectHabitProps) =
           width: 20,
           height: 20,
         }}
-      /> */}
+      />
       {error && <Text style={{ color: '#ef4444', marginTop: 4 }}>{error}</Text>}
     </>
   );
