@@ -44,6 +44,7 @@ export const CreateGoal = ({ onSuccess }: CreateGoalProps) => {
           name,
           description: description || null,
           hours_required: parseInt(hours, 10),
+          hours_completed: 0
         },
       ]);
 
