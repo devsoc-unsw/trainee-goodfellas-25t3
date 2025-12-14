@@ -43,3 +43,18 @@ export async function createHabit(
     return { error: error.message };
   }
 }
+
+export async function deleteHabit(session:Session|null, id:number) {
+  if (!session?.user) {
+    return { error: 'Must be logged in to delete a habit.' };
+  }
+
+  // goals will also be deleted, table constraint cascades the change
+  const { data, error } = await supabase
+    .from('habits')
+    .delete().in('id', [id])
+    .eq('user_id', session.user.id);
+  if (error) {
+    return { error: error.message };
+  }
+}
