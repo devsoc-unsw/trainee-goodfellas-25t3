@@ -4,7 +4,11 @@ import { Button, TextInput, View, Text, StyleSheet } from 'react-native';
 import { useSession } from '../../contexts/SessionContext';
 import { SelectHabit } from './HabitSelector';
 
-export const CreateGoal = () => {
+interface CreateGoalProps {
+  onSuccess?: () => void;
+}
+
+export const CreateGoal = ({ onSuccess }: CreateGoalProps) => {
   const { session } = useSession()
 
   const [name, setName] = useState("");
@@ -52,6 +56,8 @@ export const CreateGoal = () => {
       setName("");
       setDescription("");
       setHours("");
+      setHabit(null);
+      onSuccess?.(); // Notify parent of success
     }
   };
 
