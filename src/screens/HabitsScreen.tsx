@@ -4,9 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Habit } from '../types/habit';
-import { supabase } from '../utils/supabase';
 import { useSession } from '../contexts/SessionContext';
 import { HabitsStackParamList } from '../navigation/AppNavigator';
+import { fetchHabits as getHabits } from '../services/habitServices';
 
 export const HabitsScreen = () => {
   const { session } = useSession();
@@ -29,17 +29,14 @@ export const HabitsScreen = () => {
     setLoading(true);
     setError(null);
 
-    const { data, error } = await supabase
-      .from('habits')
-      .select('*')
-      .eq('user_id', session.user.id);
+    const ret = await getHabits(session);
 
-    if (error) {
-      setError(error.message);
+    if (ret.error) {
+      setError(ret.error);
       console.error('Error fetching habits:', error);
-    } else if (data) {
-      setHabits(data);
-      console.log('Fetched habits:', data);
+    } else if (ret.habits) {
+      setHabits(ret.habits);
+      console.log('Fetched habits:', ret.habits);
     }
 
     setLoading(false);

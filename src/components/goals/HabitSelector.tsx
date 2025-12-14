@@ -5,6 +5,7 @@ import { Habit } from '../../types/habit'
 import Dropdown from 'react-native-input-select';
 import { Picker } from '@react-native-picker/picker'
 import { Text } from 'react-native';
+import { fetchHabits } from '../../services/habitServices';
 
 // used for the dropdown to select a habit in goals menu
 
@@ -24,31 +25,20 @@ export const SelectHabit = ({ setSelected, refreshTrigger }: SelectHabitProps) =
   const [ selectedOpt, setSelectedOpt ] = useState<number | undefined>();
   const [ error, setError ] = useState<string | null>(null);
 
-  const fetchHabits = useCallback(async () => {
-    if (!session?.user) {
-      setError('Must be logged in to fetch habits.');
-      return;
-    }
-
-    setError(null);
-
-    const { data, error } = await supabase
-      .from('habits')
-      .select('*')
-      .eq('user_id', session.user.id); // Only fetch habits for current user
-
-    if (error) {
-      setError(error.message);
+  const fetchOptions = useCallback(async () => {
+    const ret = await fetchHabits(session);
+    if (ret.error) {
+      setError(ret.error);
       console.error(error);
-    } else if (data) {
-      setDropdownOpts(data.map((e: Habit) => ({ label: e.name, value: e.id })));
+    } else if (ret.habits) {
+      setDropdownOpts(ret.habits.map((e: Habit) => ({ label: e.name, value: e.id })));
     }
   }, [session?.user]);
 
   // Initial load and refresh when refreshTrigger changes
   useEffect(() => {
-    fetchHabits();
-  }, [fetchHabits, refreshTrigger]);
+    fetchOptions();
+  }, [fetchOptions, refreshTrigger]);
 
   // Subscribe to real-time changes in habits table
   useEffect(() => {
@@ -65,7 +55,7 @@ export const SelectHabit = ({ setSelected, refreshTrigger }: SelectHabitProps) =
           filter: `user_id=eq.${session.user.id}`,
         },
         () => {
-          fetchHabits(); // Refresh when changes occur
+          fetchOptions(); // Refresh when changes occur
         }
       )
       .subscribe();
@@ -73,7 +63,7 @@ export const SelectHabit = ({ setSelected, refreshTrigger }: SelectHabitProps) =
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [session?.user, fetchHabits]);
+  }, [session?.user, fetchOptions]);
 
   const PickerItem = ({ label, value }: PickerItemProps) => {
     return (
