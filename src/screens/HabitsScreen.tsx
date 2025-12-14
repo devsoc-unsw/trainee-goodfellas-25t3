@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { useState, useEffect, useCallback } from 'react';
+import { Text, View, TouchableOpacity, FlatList, ActivityIndicator, Button } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -20,7 +20,7 @@ export const HabitsScreen = () => {
   }, [session]);
 
   // TODO: No refresh functionality - need to add pull-to-refresh or manual refresh button
-  async function fetchHabits() {
+  const fetchHabits = useCallback(async () => {
     if (!session?.user) {
       setLoading(false);
       return;
@@ -40,7 +40,7 @@ export const HabitsScreen = () => {
     }
 
     setLoading(false);
-  }
+  }, [session?.user]);
   
   function redirectToHabitScreen(habit: Habit) {
     navigation.navigate('SingleHabit', { habit });
@@ -91,6 +91,7 @@ export const HabitsScreen = () => {
             )}
           />
         )}
+        <Button title='refresh' onPress={() => fetchHabits()}/>
       </View>
     </SafeAreaView>
   );
