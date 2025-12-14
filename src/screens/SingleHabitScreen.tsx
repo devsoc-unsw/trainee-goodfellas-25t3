@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { useSession } from '../contexts/SessionContext';
 import { supabase } from '../utils/supabase';
 import { FlatList } from 'react-native-gesture-handler';
-import { Card, Title, Paragraph } from "react-native-paper";
+import { Card } from "react-native-paper";
+import { EChartWrapper } from "../components/common/EChartWrapper"
 
 interface SingleHabitScreenProps {
   route?: {
@@ -39,9 +40,9 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
     setError(null);
 
     const { data, error } = await supabase
-      .from('habits')
+      .from('goals')
       .select('*')
-      .eq('id', habit?.id);
+      .eq('habit_id', habit?.id);
 
     if (error) {
       setError(error.message);
@@ -63,6 +64,52 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
         </View>
       </SafeAreaView>
     );
+  }
+
+  const displayGoalProgressGraph = (goal: Goal) => {
+    const value = 100; // TODO: update this
+    const max = goal.hours_required;
+    const percent = Math.round((value / max) * 100);
+
+    return {
+      backgroundColor: 'transparent',
+      grid: {
+        left: 12,
+        right: 12,
+        top: 20,
+        bottom: 12,
+        containLabel: true
+      },      
+      xAxis: { 
+        type: 'value', 
+        name: 'Hours Completed', 
+        nameLocation: 'middle',
+        nameGap: 20,
+        max, 
+        show: true
+      },
+      yAxis: { 
+        type: 'category', 
+        data: ['Progress'], 
+        show: true 
+      },
+      series: [
+        {
+          type: 'bar',
+          data: [{ value }],
+          barWidth: 18,
+          itemStyle: { color: '#1a7fe6', borderRadius: 9 },
+          label: {
+            show: true,
+            position: 'insideRight',
+            formatter: `${percent}%`,
+            color: '#fff',
+            fontWeight: '600',
+          },
+        },
+      ],
+    };
+
   }
 
   return (
@@ -91,10 +138,12 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
                   keyExtractor={(item) => item.id.toString()}
                   renderItem={({ item }) => (
                     <View>
-                      <Card>
+                      <Card className="mt-2 mb-2">
                         <Card.Content>
                           <Text className="text-lg">Goal: {item.name}</Text>
                           <Text className="text-base">Description: {item.description}</Text>
+                          <Text className="text-base">Progress: {item.hours_completed} / {item.hours_required} hours completed</Text>
+                          <EChartWrapper option={displayGoalProgressGraph(item) as any} height={60} />
                         </Card.Content>
                       </Card>
                     </View>
