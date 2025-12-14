@@ -67,6 +67,7 @@ export const CreateGoal = ({ onSuccess }: CreateGoalProps) => {
 
   return (
     <View className='gap-4'>
+      <SelectHabit setSelected={getSelectedHabit}/>
       <TextInput
         className="w-72 h-12 px-4 rounded-lg bg-neutral-900 text-white border border-neutral-700"
         placeholder="Goal Name"
@@ -94,7 +95,6 @@ export const CreateGoal = ({ onSuccess }: CreateGoalProps) => {
         onPress={handleCreateGoal}
         disabled={loading}
       />
-      <SelectHabit setSelected={getSelectedHabit}/>
       {error && <Text className='text-red-500'>{error}</Text>}
     </View>
   );
