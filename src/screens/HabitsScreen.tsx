@@ -19,7 +19,6 @@ export const HabitsScreen = () => {
     fetchHabits();
   }, [session]);
 
-  // TODO: No refresh functionality - need to add pull-to-refresh or manual refresh button
   const fetchHabits = useCallback(async () => {
     if (!session?.user) {
       setLoading(false);
