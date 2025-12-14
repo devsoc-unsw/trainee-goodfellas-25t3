@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Text, View, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Habit } from '../types/habit';
 import { supabase } from '../utils/supabase';
 import { useSession } from '../contexts/SessionContext';
+import { HabitsStackParamList } from '../navigation/AppNavigator';
 
 export const HabitsScreen = () => {
   const { session } = useSession();
   const [habits, setHabits] = useState<Habit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigation = useNavigation<NativeStackNavigationProp<HabitsStackParamList>>();
 
   useEffect(() => {
     fetchHabits();
@@ -42,8 +46,7 @@ export const HabitsScreen = () => {
   }
   
   function redirectToHabitScreen(habit: Habit) {
-    // TODO: implement navigation to single habit screen
-    console.log('Navigate to habit:', habit.name);
+    navigation.navigate('SingleHabit', { habit });
   }
 
   if (loading) {

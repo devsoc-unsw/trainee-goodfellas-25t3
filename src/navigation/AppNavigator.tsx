@@ -1,5 +1,6 @@
 import { NavigationContainer, DefaultTheme, Theme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 
 import { DashboardScreen } from '../screens/DashboardScreen';
@@ -7,6 +8,8 @@ import { GoalsScreen } from '../screens/GoalsScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { TimerScreen } from '../screens/TimerScreen';
 import { HabitsScreen } from '../screens/HabitsScreen';
+import { SingleHabitScreen } from '../screens/SingleHabitScreen';
+import { Habit } from '../types/habit';
 
 export type RootTabParamList = {
   HomePage: undefined;
@@ -15,7 +18,13 @@ export type RootTabParamList = {
   UserProfile: undefined;
 };
 
+export type HabitsStackParamList = {
+  HabitsList: undefined; 
+  SingleHabit: { habit: Habit };
+};
+
 const Tab = createBottomTabNavigator<RootTabParamList>();
+const Stack = createNativeStackNavigator<HabitsStackParamList>();
 
 const navTheme: Theme = {
   ...DefaultTheme,
@@ -36,6 +45,30 @@ const iconMap: Record<keyof RootTabParamList, keyof typeof Ionicons.glyphMap> = 
   UserProfile: 'person',
 };
 
+// Stack navigator for Habits
+// The native stack avigator is suitable for this job.
+// Reference: https://reactnavigation.org/docs/native-stack-navigator/
+const HabitsStack = () => (
+  <Stack.Navigator
+    screenOptions={{
+      headerStyle: { backgroundColor: '#030712' },
+      headerTintColor: '#ffffff',
+      headerTitleStyle: { fontWeight: 'bold' },
+    }}
+  >
+    <Stack.Screen
+      name="HabitsList"
+      component={HabitsScreen}
+      options={{ title: 'My Habits' }}
+    />
+    <Stack.Screen
+      name="SingleHabit"
+      component={SingleHabitScreen}
+      options={{ title: 'Habit Details' }}
+    />
+  </Stack.Navigator>
+);
+
 export const AppNavigator = () => (
   <NavigationContainer theme={navTheme}>
     <Tab.Navigator
@@ -54,7 +87,7 @@ export const AppNavigator = () => (
     >
       <Tab.Screen name="HomePage" options={{ tabBarLabel: "Home Page"}} component={DashboardScreen} />
       <Tab.Screen name="CreateGoals" options={{ tabBarLabel: "Create Goals"}} component={GoalsScreen} />
-      <Tab.Screen name="ListOfHabits" options={{ tabBarLabel: "List of Habits"}} component={HabitsScreen} />
+      <Tab.Screen name="ListOfHabits" options={{ tabBarLabel: "List of Habits"}} component={HabitsStack} />
       <Tab.Screen name="UserProfile" options={{ tabBarLabel: "User Profile"}} component={SettingsScreen} />
     </Tab.Navigator>
   </NavigationContainer>
