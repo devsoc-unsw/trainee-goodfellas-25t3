@@ -17,3 +17,29 @@ export async function fetchHabits(session: Session|null) {
 
     return { habits: data };
 }
+
+export async function createHabit(
+  session:Session|null, name: string, description: string) {
+  if (!name) {
+    return { error: 'Name is required.' };
+  }
+
+  if (!session?.user) {
+    return { error: 'Must be logged in to create a habit.' };
+  }
+  const { data, error } = await supabase
+    .from('habits')
+    .insert([
+      {
+        user_id: session.user.id,
+        name,
+        description: description || null,
+        created_at: new Date(),
+        total_hours: 0
+      }
+    ]);
+
+  if (error) {
+    return { error: error.message };
+  }
+}

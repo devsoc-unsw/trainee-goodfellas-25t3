@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { supabase } from '../../utils/supabase'
-import { Button, TextInput, View, Text, StyleSheet } from 'react-native';
+import { Button, TextInput, View, Text } from 'react-native';
 import { useSession } from '../../contexts/SessionContext';
+import { createHabit } from '../../services/habitServices';
 
 export const CreateHabit = () => {
   const { session } = useSession();
@@ -12,35 +12,15 @@ export const CreateHabit = () => {
   const [error, setError] = useState<string | null>(null);
 
   const handleCreateHabit = async () => {
-    if (!name) {
-      setError('Name is required.');
-      return;
-    }
-
-    if (!session?.user) {
-      setError('Must be logged in to create a habit.');
-      return;
-    }
-
     setLoading(true);
     setError(null);
 
-    const { data, error } = await supabase
-      .from('habits')
-      .insert([
-        {
-          user_id: session.user.id,
-          name,
-          description: description || null,
-          created_at: new Date(),
-          total_hours: 0
-        }
-      ]);
+    const ret = await createHabit(session, name, description);
 
     setLoading(false);
 
-    if (error) {
-      setError(error.message);
+    if (ret?.error) {
+      setError(ret.error);
       console.error(error);
     } else {
       setName('');
