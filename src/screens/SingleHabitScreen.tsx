@@ -1,4 +1,4 @@
-import { Text, View, ActivityIndicator } from 'react-native';
+import { Text, View, ActivityIndicator, Button, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Habit } from '../types/habit';
 import { Goal } from "../types/goal";
@@ -24,6 +24,7 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [inputs, setInputs] = useState<Record<number, string>>({});
 
   useEffect(() => {
     fetchGoals();
@@ -112,6 +113,37 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
 
   }
 
+  // Increment and decrement
+  const incrementHours = async (hours: string, hoursCompleted: number, itemId: number) => {
+    const { data, error } = await supabase
+      .from("goals")
+      .update(
+        {
+          hours_completed: hoursCompleted + parseInt(hours)
+        },
+      )
+      .eq("id", itemId)
+      .select();
+
+    if (error) {
+      console.error('Error:', error);
+    } else {
+      console.log('Updated Row:', data);
+    }
+  }
+
+  const decrementHours = async (hours: string, hoursCompleted: number, itemId: number) => {
+    const { data, error } = await supabase
+      .from("goals")
+      .update(
+        {
+          hours_completed: hoursCompleted - (parseInt(hours) || 0)
+        },
+      )
+      .eq("id", itemId)
+      .select();
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-[#030712]">
       <View className="flex-1 px-4 pt-4">
@@ -144,6 +176,28 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
                           <Text className="text-base">Description: {item.description}</Text>
                           <Text className="text-base">Progress: {item.hours_completed} / {item.hours_required} hours completed</Text>
                           <EChartWrapper option={displayGoalProgressGraph(item) as any} height={60} />
+                          <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "5" }}>
+                            <Text>Hours:</Text>
+                            <TextInput
+                              keyboardType="number-pad"
+                              value={inputs[item.id] ?? ''}
+                              onChangeText={(text) =>
+                                setInputs(prev => ({
+                                  ...prev,
+                                  [item.id]: text.replace(/[^0-9]/g, ""), // Replace anything that is not 0-9 with ""
+                                }))
+                              }
+                              style={{
+                                borderWidth: 1,
+                                borderColor: '#ccc',
+                                padding: 6,
+                                minWidth: 60
+                              }}
+                            />
+                            <Button title="Increase" onPress={() => incrementHours(inputs[item.id], item.hours_completed, item.id)} />
+                            <Button title="Decrease" onPress={() => decrementHours(inputs[item.id], item.hours_completed, item.id)} />
+                          </View>
+                          
                         </Card.Content>
                       </Card>
                     </View>
