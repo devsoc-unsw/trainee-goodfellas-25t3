@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button, TextInput, View, Text, StyleSheet } from 'react-native';
 import { useSession } from '../../contexts/SessionContext';
 import { SelectHabit } from './HabitSelector';
-import { supabase } from '../../utils/supabase';
+import { createGoal } from '../../services/goalServices';
 
 interface CreateGoalProps {
   onSuccess?: () => void;
@@ -29,29 +29,15 @@ export const CreateGoal = ({ onSuccess }: CreateGoalProps) => {
       return;
     }
 
-    if (!name || !hours) {
-      setError("Name and hours are required.");
-      return;
-    }
-
     setLoading(true);
     setError(null);
-    const { data, error } = await supabase
-      .from("goals")
-      .insert([
-        {
-          habit_id: selectedHabit,
-          name,
-          description: description || null,
-          hours_required: parseInt(hours, 10),
-          hours_completed: 0
-        },
-      ]);
+    
+    const ret = await createGoal(session, name, description, selectedHabit, parseInt(hours, 10));
 
     setLoading(false);
 
-    if (error) {
-      setError(error.message);
+    if (ret?.error) {
+      setError(ret?.error);
       console.error(error);
     } else {
       setName("");
