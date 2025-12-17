@@ -12,6 +12,10 @@ export const CreateHabit = () => {
   const [error, setError] = useState<string | null>(null);
 
   const handleCreateHabit = async () => {
+    if (!session?.user) {
+      return { error: 'Must be logged in to create a habit.' };
+    }
+
     setLoading(true);
     setError(null);
 

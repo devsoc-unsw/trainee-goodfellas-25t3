@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { supabase } from '../../utils/supabase'
 import { Button, TextInput, View, Text, StyleSheet } from 'react-native';
 import { useSession } from '../../contexts/SessionContext';
 import { SelectHabit } from './HabitSelector';
+import { supabase } from '../../utils/supabase';
 
 interface CreateGoalProps {
   onSuccess?: () => void;
@@ -19,6 +19,11 @@ export const CreateGoal = ({ onSuccess }: CreateGoalProps) => {
   const [error, setError] = useState<string | null>(null);
 
   const handleCreateGoal = async () => {
+    if (!session?.user) {
+      setError("Must be logged in to create a goal.");
+      return;
+    }
+
     if (!selectedHabit) {
       setError('Please select a habit.');
       return;
@@ -26,11 +31,6 @@ export const CreateGoal = ({ onSuccess }: CreateGoalProps) => {
 
     if (!name || !hours) {
       setError("Name and hours are required.");
-      return;
-    }
-
-    if (!session?.user) {
-      setError("Must be logged in to create a goal.");
       return;
     }
 

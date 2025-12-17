@@ -15,32 +15,29 @@ export async function getHabit(session:Session, id:number) {
   return { habit: data };
 }
 
-export async function fetchHabits(session: Session|null) {
+export async function fetchHabits(session: Session) {
   if (!session?.user) {
-      return { error: 'Must be logged in to fetch habits.' };
-    }
+    return { error: 'Must be logged in to fetch habits.' };
+  }
 
-    const { data, error } = await supabase
-      .from('habits')
-      .select('*')
-      .eq('user_id', session.user.id); // Only fetch habits for current user
+  const { data, error } = await supabase
+    .from('habits')
+    .select('*')
+    .eq('user_id', session.user.id); // Only fetch habits for current user
 
-    if (error) {
-      return { error: error.message };
-    }
+  if (error) {
+    return { error: error.message };
+  }
 
-    return { habits: data };
+  return { habits: data };
 }
 
 export async function createHabit(
-  session:Session|null, name: string, description: string) {
+  session:Session, name: string, description: string) {
   if (!name) {
     return { error: 'Name is required.' };
   }
 
-  if (!session?.user) {
-    return { error: 'Must be logged in to create a habit.' };
-  }
   const { data, error } = await supabase
     .from('habits')
     .insert([
@@ -58,11 +55,7 @@ export async function createHabit(
   }
 }
 
-export async function deleteHabit(session:Session|null, id:number) {
-  if (!session?.user) {
-    return { error: 'Must be logged in to delete a habit.' };
-  }
-
+export async function deleteHabit(session:Session, id:number) {
   // goals will also be deleted, table constraint cascades the change
   const { data, error } = await supabase
     .from('habits')
@@ -74,11 +67,7 @@ export async function deleteHabit(session:Session|null, id:number) {
 }
 
 export async function updateHabit(
-  session:Session|null, id: number, name?: string, description?: string) {
-  if (!session?.user) {
-    return { error: 'Must be logged in to edit a habit.' };
-  }
-
+  session:Session, id: number, name?: string, description?: string) {
   const {error: err, habit} = await getHabit(session, id);
   if (err) {
     return { error: err };
@@ -96,8 +85,6 @@ export async function updateHabit(
     user_id: habit.user_id
   };
 
-  console.log(`new stuff is ${name} and ${description} we update ${id}`);
-  console.log(`old stuff is ${habit.name} and ${habit.description}`);
   const { data, error } = await supabase
     .from('habits')
     .update(updated)
