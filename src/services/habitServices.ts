@@ -73,7 +73,6 @@ export async function deleteHabit(session:Session|null, id:number) {
   }
 }
 
-// TODO: this works, just need to fix RLS policy for updating
 export async function updateHabit(
   session:Session|null, id: number, name?: string, description?: string) {
   if (!session?.user) {
