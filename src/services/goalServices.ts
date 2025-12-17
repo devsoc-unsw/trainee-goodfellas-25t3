@@ -43,3 +43,13 @@ export async function createGoal(
     return { error: error.message };
   }
 }
+
+export async function deleteGoal(id: number) {
+  // postgresql function called handles user ownership of data
+  const { data, error } = await supabase
+    .rpc('delete_goal', { goal_id: id });
+  
+  if (error) {
+    return { error: error.message }
+  }
+}
