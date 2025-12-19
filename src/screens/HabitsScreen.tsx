@@ -1,46 +1,28 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Text, View, TouchableOpacity, FlatList, ActivityIndicator, Button } from 'react-native';
+import { Text, View, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Habit } from '../types/habit';
-import { useSession } from '../contexts/SessionContext';
 import { HabitsStackParamList } from '../navigation/AppNavigator';
-import { fetchHabits as getHabits } from '../services/habitServices';
+import { useHabitsData } from '../hooks/useHabitsData';
 
 export const HabitsScreen = () => {
-  const { session } = useSession();
-  const [habits, setHabits] = useState<Habit[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const navigation = useNavigation<NativeStackNavigationProp<HabitsStackParamList>>();
-
-  useEffect(() => {
-    fetchHabits();
-  }, [session]);
-
-  const fetchHabits = useCallback(async () => {
-    if (!session?.user) {
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    const ret = await getHabits(session);
-
-    if (ret.error) {
-      setError(ret.error);
-      console.error('Error fetching habits:', error);
-    } else if (ret.habits) {
-      setHabits(ret.habits);
-      console.log('Fetched habits:', ret.habits);
-    }
-
-    setLoading(false);
-  }, [session?.user]);
+  /**
+   * Use our custom hook to get habits data
+   * No need to write all the fetching code here anymore!
+   * The hook automatically:
+   * - Loads habits when screen opens
+   * - Updates when habits change in database
+   * - Handles loading and errors
+   */
+  const { habits, loading, error } = useHabitsData();
   
+  // Get navigation so we can go to the single habit screen
+  const navigation = useNavigation<NativeStackNavigationProp<HabitsStackParamList>>();
+  
+  /**
+   * Function to navigate to a single habit's detail page
+   */
   function redirectToHabitScreen(habit: Habit) {
     navigation.navigate('SingleHabit', { habit });
   }
@@ -65,12 +47,14 @@ export const HabitsScreen = () => {
             <Text className="text-red-400">{error}</Text>
           </View>
         )}
+        {/* Show message if no habits exist */}
         {habits.length === 0 ? (
           <View className="flex-1 items-center justify-center">
             <Text className="text-gray-400 mb-2">No habits yet</Text>
             <Text className="text-gray-500 text-sm">Go to Create Goals tab to add habits</Text>
           </View>
         ) : (
+          /* Show list of all habits */
           <FlatList
             data={habits}
             keyExtractor={(item) => item.id.toString()}
@@ -90,7 +74,6 @@ export const HabitsScreen = () => {
             )}
           />
         )}
-        <Button title='refresh' onPress={() => fetchHabits()}/>
       </View>
     </SafeAreaView>
   );

@@ -1,12 +1,9 @@
-import { Text, View, ActivityIndicator, Button, TextInput } from 'react-native';
+import { Text, View, ActivityIndicator, TextInput, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Habit } from '../types/habit';
 import { Goal } from "../types/goal";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useSession } from '../contexts/SessionContext';
-import { FlatList } from 'react-native-gesture-handler';
-import { Card } from "react-native-paper";
-import { EChartWrapper } from "../components/common/EChartWrapper"
 import { fetchGoals as getGoals, updateGoal } from '../services/goalServices';
 
 interface SingleHabitScreenProps {
@@ -19,23 +16,20 @@ interface SingleHabitScreenProps {
 
 export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
   const habit = route?.params?.habit;
-
   const { session } = useSession();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [inputs, setInputs] = useState<Record<number, string>>({});
+  const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
+  const [customHours, setCustomHours] = useState<Record<number, string>>({});
 
   useEffect(() => {
     fetchGoals();
   }, [session]);
 
   async function fetchGoals() {
-    if (!session?.user) {
-      setError('Must be logged in to fetch goals.')
-      return;
-    }
-    if (!habit?.id) {
+    if (!session?.user || !habit?.id) {
+      setError('Must be logged in to fetch goals.');
       return;
     }
 
@@ -49,154 +43,218 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
     setLoading(false);
   }
 
+  // Update hours with custom or preset amount
+  const updateHours = async (goalId: number, currentHours: number, amount: number) => {
+    const newHours = Math.max(0, currentHours + amount); // Prevent negative hours
+    const ret = await updateGoal(goalId, undefined, undefined, undefined, newHours);
+    if (ret?.error) {
+      setError(ret.error);
+    } else {
+      setError(null);
+      setCustomHours(prev => ({ ...prev, [goalId]: '' })); // Clear input after success
+      fetchGoals();
+    }
+  };
+
+  // Add custom hours from input
+  const addCustomHours = async (goalId: number, currentHours: number) => {
+    const hours = parseInt(customHours[goalId] || '0');
+    if (hours > 0) {
+      await updateHours(goalId, currentHours, hours);
+    }
+  };
+
+  // Calculate overall stats
+  const stats = useMemo(() => {
+    const totalCompleted = goals.reduce((sum, g) => sum + g.hours_completed, 0);
+    const totalRequired = goals.reduce((sum, g) => sum + g.hours_required, 0);
+    const overallProgress = totalRequired > 0 ? (totalCompleted / totalRequired) * 100 : 0;
+    const completedGoals = goals.filter(g => g.hours_completed >= g.hours_required).length;
+    
+    return { totalCompleted, totalRequired, overallProgress, completedGoals };
+  }, [goals]);
+
   if (loading) {
     return (
       <SafeAreaView className="flex-1 bg-[#030712]">
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#1a7fe6" />
-          <Text className="text-gray-400 mt-4">Loading goals...</Text>
+          <ActivityIndicator size="large" color="#3b82f6" />
+          <Text className="text-gray-400 mt-4">Loading...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  const displayGoalProgressGraph = (goal: Goal) => {
-    const value = goal.hours_completed;
-    const max = goal.hours_required;
-    const percent = Math.round((value / max) * 100);
-
-    return {
-      backgroundColor: 'transparent',
-      grid: {
-        left: 12,
-        right: 12,
-        top: 20,
-        bottom: 12,
-        containLabel: true
-      },      
-      xAxis: { 
-        type: 'value', 
-        name: 'Hours Completed', 
-        nameLocation: 'middle',
-        nameGap: 20,
-        max, 
-        show: true
-      },
-      yAxis: { 
-        type: 'category', 
-        data: ['Progress'], 
-        show: true 
-      },
-      series: [
-        {
-          type: 'bar',
-          data: [{ value }],
-          barWidth: 18,
-          itemStyle: { color: '#1a7fe6', borderRadius: 9 },
-          label: {
-            show: true,
-            position: 'insideRight',
-            formatter: `${percent}%`,
-            color: '#fff',
-            fontWeight: '600',
-          },
-        },
-      ],
-    };
-
-  }
-
-  // Increment and decrement
-  const incrementHours = async (hours: string, hoursCompleted: number, itemId: number) => {
-    const ret = await updateGoal(
-      itemId, undefined, undefined, undefined, hoursCompleted + parseInt(hours));
-
-    if (ret?.error) {
-      setError(ret.error);
-    }
-    fetchGoals();
-  }
-
-  const decrementHours = async (hours: string, hoursCompleted: number, itemId: number) => {
-    const ret = await updateGoal(
-      itemId, undefined, undefined, undefined, hoursCompleted - parseInt(hours));
-
-    if (ret?.error) {
-      setError(ret.error);
-    }
-    fetchGoals();
+  if (!habit) {
+    return (
+      <SafeAreaView className="flex-1 bg-[#030712]">
+        <View className="flex-1 items-center justify-center">
+          <Text className="text-gray-400 text-lg">Unable to load habit</Text>
+        </View>
+      </SafeAreaView>
+    );
   }
 
   return (
     <SafeAreaView className="flex-1 bg-[#030712]">
-      <View className="flex-1 px-4 pt-4">
-        {!habit ? (
-          <View className="flex-1 items-center justify-center">
-            <ActivityIndicator size="large" color="#1a7fe6" />
-            {/* It is actually loading goals for that habit */}
-            <Text className="text-gray-400 mt-4">Habit unable to load ;-;</Text>
-          </View>
-        ) : (
-          <View>
-            {loading ? (
-              <View className="flex-1 items-center justify-center">
-                <ActivityIndicator size="large" color="#1a7fe6" />
-                <Text className="text-gray-400 mt-4">Loading goals...</Text>
-              </View>
-            ) : (
-              <View>
-                <Text className="text-2xl font-bold text-white mb-4 self-center">{habit.name}</Text>
-                <Text className="text-gray-400 text-sm mt-1 self-center">{habit.description}</Text>
-                <Text className="text-xl font-bold text-white mt-4 mb-4 self-center">Goals for {habit.name}</Text>
-                <FlatList 
-                  data={goals}
-                  keyExtractor={(item) => item.id.toString()}
-                  renderItem={({ item }) => (
-                    <View>
-                      <Card className="mt-2 mb-2">
-                        <Card.Content>
-                          <Text className="text-lg">Goal: {item.name}</Text>
-                          <Text className="text-base">Description: {item.description}</Text>
-                          <Text className="text-base">Progress: {item.hours_completed} / {item.hours_required} hours completed</Text>
-                          <EChartWrapper option={displayGoalProgressGraph(item) as any} height={60} />
-                          <View style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "5" }}>
-                            <Text>Hours:</Text>
-                            <TextInput
-                              keyboardType="number-pad"
-                              value={inputs[item.id] ?? ''}
-                              onChangeText={(text) =>
-                                setInputs(prev => ({
-                                  ...prev,
-                                  [item.id]: text.replace(/[^0-9]/g, ""), // Replace anything that is not 0-9 with ""
-                                }))
-                              }
-                              style={{
-                                borderWidth: 1,
-                                borderColor: '#ccc',
-                                padding: 6,
-                                minWidth: 60
-                              }}
-                            />
-                            <Button title="Increase" onPress={() => incrementHours(inputs[item.id], item.hours_completed, item.id)} />
-                            <Button title="Decrease" onPress={() => decrementHours(inputs[item.id], item.hours_completed, item.id)} />
-                            {error && (
-                              <View className="bg-red-900/20 border border-red-500 rounded-lg p-3 mb-4">
-                                <Text className="text-red-400">{error}</Text>
-                              </View>
-                            )}
-                          </View>
-                        </Card.Content>
-                      </Card>
-                    </View>
-                  )}
-                />
-              </View>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        {/* Hero Header */}
+        <View className="px-6 pt-6 pb-4">
+          <View className="items-center mb-6">
+            <Text className="text-3xl font-bold text-white text-center mb-2">
+              {habit.name}
+            </Text>
+            {habit.description && (
+              <Text className="text-gray-400 text-center text-base max-w-[80%]">
+                {habit.description}
+              </Text>
             )}
           </View>
+        </View>
+
+        {/* Error Message */}
+        {error && (
+          <View className="mx-6 mb-4 bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+            <Text className="text-red-400 text-sm">{error}</Text>
+          </View>
         )}
-        {/* FIXME: feel free to remove this button, i added it to test */}
-        <Button title='refresh' onPress={() => fetchGoals()}/>
-      </View>
+
+        {/* Goals Section */}
+        <View className="px-6 pb-6">
+          <Text className="text-xl font-bold text-white mb-4">
+            Your Goals {goals.length > 0 && `(${goals.length})`}
+          </Text>
+
+          {goals.length === 0 ? (
+            <View className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-8 items-center">
+              <Text className="text-gray-400 text-center text-base mb-1">No goals yet</Text>
+              <Text className="text-gray-500 text-center text-sm">
+                Create a goal to start tracking your progress
+              </Text>
+            </View>
+          ) : (
+            goals.map((goal, index) => {
+              const progress = goal.hours_required > 0 
+                ? (goal.hours_completed / goal.hours_required) * 100 
+                : 0;
+              const isCompleted = progress >= 100;
+              const isSelected = selectedGoalId === goal.id;
+              
+              return (
+                <View 
+                  key={goal.id} 
+                  className="mb-4 bg-gray-800/40 border border-gray-700/50 rounded-2xl p-5 overflow-hidden"
+                >
+                  {/* Goal Header */}
+                  <View className="flex-row items-start justify-between mb-3">
+                    <View className="flex-1 mr-3">
+                      <View className="flex-row items-center mb-1">
+                        <Text className="text-white text-lg font-bold flex-1">
+                          {goal.name}
+                        </Text>
+                        {isCompleted && (
+                          <View className="bg-green-500/20 border border-green-500/40 rounded-full px-2 py-1">
+                            <Text className="text-green-400 text-xs font-semibold">✓ Done</Text>
+                          </View>
+                        )}
+                      </View>
+                      {goal.description && (
+                        <Text className="text-gray-400 text-sm mt-1" numberOfLines={2}>
+                          {goal.description}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+
+                  {/* Progress Stats */}
+                  <View className="flex-row items-center justify-between mb-3">
+                    <Text className="text-gray-500 text-sm">
+                      {goal.hours_completed} / {goal.hours_required} hours
+                    </Text>
+                    <Text className={`text-sm font-semibold ${isCompleted ? 'text-green-400' : 'text-blue-400'}`}>
+                      {progress.toFixed(0)}%
+                    </Text>
+                  </View>
+
+                  {/* Progress Bar */}
+                  <View className="h-2 bg-gray-700/50 rounded-full overflow-hidden mb-4">
+                    <View 
+                      className={`h-full rounded-full ${isCompleted ? 'bg-green-500' : 'bg-blue-500'}`}
+                      style={{ width: `${Math.min(progress, 100)}%` }}
+                    />
+                  </View>
+
+                  {/* Custom Hours Input */}
+                  <View className="flex-row items-center gap-2">
+                    <TextInput
+                      keyboardType="number-pad"
+                      value={customHours[goal.id] ?? ''}
+                      onChangeText={(text) =>
+                        setCustomHours(prev => ({
+                          ...prev,
+                          [goal.id]: text.replace(/[^0-9]/g, ''),
+                        }))
+                      }
+                      placeholder="Hours"
+                      placeholderTextColor="#6b7280"
+                      className="bg-gray-700/50 border border-gray-600 text-white rounded-xl px-4 py-3 text-center min-w-[80px]"
+                    />
+                    
+                    <TouchableOpacity 
+                      onPress={() => addCustomHours(goal.id, goal.hours_completed)}
+                      className="bg-blue-600 active:bg-blue-700 rounded-xl px-5 py-3 flex-1"
+                    >
+                      <Text className="text-white text-center font-semibold">Add Hours</Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity 
+                      onPress={() => setSelectedGoalId(isSelected ? null : goal.id)}
+                      className="bg-gray-700 active:bg-gray-600 rounded-xl px-4 py-3"
+                    >
+                      <Text className="text-white text-center font-semibold text-base">
+                        {isSelected ? '✕' : '···'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Quick Actions (Expanded) */}
+                  {isSelected && (
+                    <View className="mt-4 pt-4 border-t border-gray-700/50">
+                      <Text className="text-gray-400 text-sm mb-3">Quick Actions</Text>
+                      <View className="flex-row gap-2 mb-2">
+                        <TouchableOpacity 
+                          onPress={() => updateHours(goal.id, goal.hours_completed, 1)}
+                          className="bg-blue-600/20 border border-blue-500/30 rounded-xl px-4 py-3 flex-1"
+                        >
+                          <Text className="text-blue-400 font-semibold text-center">+ 1h</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                          onPress={() => updateHours(goal.id, goal.hours_completed, 5)}
+                          className="bg-blue-600/20 border border-blue-500/30 rounded-xl px-4 py-3 flex-1"
+                        >
+                          <Text className="text-blue-400 font-semibold text-center">+ 5h</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                          onPress={() => updateHours(goal.id, goal.hours_completed, 10)}
+                          className="bg-blue-600/20 border border-blue-500/30 rounded-xl px-4 py-3 flex-1"
+                        >
+                          <Text className="text-blue-400 font-semibold text-center">+ 10h</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <TouchableOpacity 
+                        onPress={() => updateHours(goal.id, goal.hours_completed, -1)}
+                        className="bg-red-600/20 border border-red-500/30 rounded-xl px-4 py-3"
+                      >
+                        <Text className="text-red-400 font-semibold text-center">- 1 Hour</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              );
+            })
+          )}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
