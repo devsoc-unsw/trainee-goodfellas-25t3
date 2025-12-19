@@ -54,7 +54,6 @@ export const HabitsScreen = () => {
   return(
     <SafeAreaView className="flex-1 bg-[#030712]">
       <View className="flex-1 px-4 pt-4">
-        <Text className="text-2xl font-bold text-white mb-4">My Habits</Text>
         {error && (
           <View className="bg-red-900/20 border border-red-500 rounded-lg p-3 mb-4">
             <Text className="text-red-400">{error}</Text>
