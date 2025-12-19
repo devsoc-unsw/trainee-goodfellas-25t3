@@ -8,6 +8,7 @@ import { supabase } from '../utils/supabase';
 import { FlatList } from 'react-native-gesture-handler';
 import { Card } from "react-native-paper";
 import { EChartWrapper } from "../components/common/EChartWrapper"
+import { fetchGoals as getGoals, updateGoal } from '../services/goalServices';
 
 interface SingleHabitScreenProps {
   route?: {
@@ -33,26 +34,20 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
   // TODO: No refresh functionality - need to add pull-to-refresh or manual refresh button
   async function fetchGoals() {
     if (!session?.user) {
-      setLoading(false);
+      setError('Must be logged in to fetch goals.')
+      return;
+    }
+    if (!habit?.id) {
       return;
     }
 
     setLoading(true);
-    setError(null);
-
-    const { data, error } = await supabase
-      .from('goals')
-      .select('*')
-      .eq('habit_id', habit?.id);
-
-    if (error) {
-      setError(error.message);
-      console.error('Error fetching goals:', error);
-    } else if (data) {
-      setGoals(data);
-      console.log('Fetched goals:', data);
+    const ret = await getGoals(habit.id);
+    if (ret?.error) {
+      setError(ret.error);
+    } else if (ret?.goals) {
+      setGoals(ret.goals);
     }
-
     setLoading(false);
   }
 
@@ -115,33 +110,23 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
 
   // Increment and decrement
   const incrementHours = async (hours: string, hoursCompleted: number, itemId: number) => {
-    const { data, error } = await supabase
-      .from("goals")
-      .update(
-        {
-          hours_completed: hoursCompleted + parseInt(hours)
-        },
-      )
-      .eq("id", itemId)
-      .select();
+    const ret = await updateGoal(
+      itemId, undefined, undefined, undefined, hoursCompleted + parseInt(hours));
 
-    if (error) {
-      console.error('Error:', error);
-    } else {
-      console.log('Updated Row:', data);
+    if (ret?.error) {
+      console.error('Error:', ret.error);
     }
+    fetchGoals();
   }
 
   const decrementHours = async (hours: string, hoursCompleted: number, itemId: number) => {
-    const { data, error } = await supabase
-      .from("goals")
-      .update(
-        {
-          hours_completed: hoursCompleted - (parseInt(hours) || 0)
-        },
-      )
-      .eq("id", itemId)
-      .select();
+    const ret = await updateGoal(
+      itemId, undefined, undefined, undefined, hoursCompleted - parseInt(hours));
+
+    if (ret?.error) {
+      console.error('Error:', ret.error);
+    }
+    fetchGoals();
   }
 
   return (
@@ -207,6 +192,8 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
             )}
           </View>
         )}
+        {/* FIXME: feel free to remove this button, i added it to test */}
+        <Button title='refresh' onPress={() => fetchGoals()}/>
       </View>
     </SafeAreaView>
   );

@@ -16,6 +16,19 @@ export async function getGoal(id: number) {
   return { goal: data[0] };
 }
 
+export async function fetchGoals(habit: number) {
+  const { data, error } = await supabase
+    .from('goals')
+    .select('*')
+    .eq('habit_id', habit);
+
+  if (error) {
+    return { error: error.message };
+  } else if (data) {
+    return { goals: data };
+  }
+}
+
 export async function createGoal(
   session:Session, name: string, description: string, habitId: number, hours: number)
 {
