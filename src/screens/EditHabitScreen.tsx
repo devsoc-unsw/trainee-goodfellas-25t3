@@ -29,7 +29,7 @@ export const EditHabitScreen = ({ route }: EditHabitScreenProps) => {
 
   const handleEditHabit = async () => {
     if (!session?.user) {
-      setError("Must be logged in to edit a goal.");
+      setError("Must be logged in to edit a habit.");
       return;
     }
 
