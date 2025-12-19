@@ -1,9 +1,9 @@
 import { Text, View, ActivityIndicator, TextInput, ScrollView, TouchableOpacity, Button } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Habit } from '../types/habit';
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from '../contexts/SessionContext';
-import { fetchGoals as getGoals, updateGoal } from '../services/goalServices';
+import { updateHabit } from '../services/habitServices';
 
 interface EditHabitScreenProps {
   route?: {
@@ -16,41 +16,36 @@ interface EditHabitScreenProps {
 export const EditHabitScreen = ({ route }: EditHabitScreenProps) => {
   const habit = route?.params?.habit;
   const { session } = useSession()
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [hours, setHours] = useState("");
+  // name and desc are allowed to be undefined, the user can choose to update one or the other
+  const [name, setName] = useState<string>();
+  const [description, setDescription] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setName(habit?.name || "");
-    setDescription(habit?.description || "");
-  }, [])
-
   const handleEditHabit = async () => {
     if (!session?.user) {
-      setError("Must be logged in to edit a habit.");
+      setError('Must be logged in to edit a habit.');
+      return;
+    }
+    if (!habit?.id) {
+      setError('Could not find this habit in the database.');
       return;
     }
 
     setLoading(true);
     setError(null);
-    
-    // const ret = await createGoal(session, name, description, selectedHabit, parseInt(hours, 10));
-    alert("create an edit HABIT call to the supabase (1) handle name checking as well, returning an error if no name");
+
+    const ret = await updateHabit(session, habit.id, name, description);
 
     setLoading(false);
 
-    // if (ret?.error) {
-    //   setError(ret?.error);
-    //   console.error(error);
-    // } else {
-    //   setName("");
-    //   setDescription("");
-    //   setHours("");
-    //   setHabit(null);
-    //   onSuccess?.(); // Notify parent of success
-    // }
+    if (ret?.error) {
+      setError(ret.error);
+      console.error(error);
+    } else {
+      setName(undefined);
+      setDescription(undefined);
+    }
   };
   
   return (
@@ -94,6 +89,11 @@ export const EditHabitScreen = ({ route }: EditHabitScreenProps) => {
               </View>
             )}
           </View>
+          {error && (
+            <View className="bg-red-900/20 border border-red-500 rounded-lg p-3 mb-4">
+              <Text className="text-red-400">{error}</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
