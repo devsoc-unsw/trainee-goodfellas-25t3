@@ -1,12 +1,15 @@
-import { Text, View, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { Text, View, TouchableOpacity, FlatList, ActivityIndicator, Button } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Habit } from '../types/habit';
 import { HabitsStackParamList } from '../navigation/AppNavigator';
 import { useHabitsData } from '../hooks/useHabitsData';
+import { useState } from "react";
 
 export const HabitsScreen = () => {
+  const [selectedHabitId, setSelectedHabitId] = useState<number | null>(null);
+
   /**
    * Use our custom hook to get habits data
    * No need to write all the fetching code here anymore!
@@ -38,6 +41,16 @@ export const HabitsScreen = () => {
     );
   }
 
+  // Delete Habit
+  const deleteHabit = (habit: Habit) => {
+    alert("delete the habit");
+  }
+
+  // Edit Habit
+  const editHabit = (habit: Habit) => {
+    alert("edit the habit");
+  }
+
   return(
     <SafeAreaView className="flex-1 bg-[#030712]">
       <View className="flex-1 px-4 pt-4">
@@ -58,20 +71,51 @@ export const HabitsScreen = () => {
           <FlatList
             data={habits}
             keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
+            renderItem={({ item }) => {
+              const isSelected = selectedHabitId === item.id;
+
+              return (
               <TouchableOpacity 
                 onPress={() => redirectToHabitScreen(item)}
-                className="bg-gray-800 p-4 rounded-lg mb-3 border border-gray-700"
+                className="bg-gray-800 p-4 rounded-lg mb-3 border border-gray-700 flex flex-column justify-between"
               >
-                <Text className="text-white text-lg font-semibold">{item.name}</Text>
-                {item.description && (
-                  <Text className="text-gray-400 text-sm mt-1">{item.description}</Text>
+                <View className="flex flex-row justify-between">
+                  <View className="w-40 flex-none">
+                    <Text className="text-white text-lg font-semibold">{item.name}</Text>
+                    {item.description && (
+                      <Text className="text-gray-400 text-sm mt-1">{item.description}</Text>
+                    )}
+                  </View>
+                  <Text className="text-gray-500 text-xs mt-2">
+                    Total hours: {item.total_hours}
+                  </Text>
+                  <TouchableOpacity 
+                    onPress={() => setSelectedHabitId(isSelected ? null : item.id)}
+                    className="bg-gray-700 active:bg-gray-600 rounded-xl px-4 py-3"
+                  >
+                    <Text className="text-white text-center font-semibold text-base">
+                      {isSelected ? '✕' : '···'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                {isSelected && (
+                  <View className="mt-4 p-4 flex flex-row gap-2 border-t border-gray-700/50 w-max">
+                    <TouchableOpacity
+                      onPress={() => editHabit(item)}
+                      className="bg-yellow-600/20 border border-yellow-500/30 rounded-xl px-5 py-3 flex-auto"
+                    >
+                      <Text className="text-yellow-400 font-semibold text-center">Edit Habit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => deleteHabit(item)}
+                      className="bg-red-600/20 border border-red-500/30 rounded-xl px-5 py-3 flex-auto"
+                    >
+                      <Text className="text-red-400 font-semibold text-center">Delete Habit</Text>
+                    </TouchableOpacity>
+                  </View>
                 )}
-                <Text className="text-gray-500 text-xs mt-2">
-                  Total hours: {item.total_hours}
-                </Text>
               </TouchableOpacity>
-            )}
+            )}}
           />
         )}
       </View>
