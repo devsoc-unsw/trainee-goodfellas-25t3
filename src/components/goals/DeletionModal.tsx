@@ -15,13 +15,18 @@ export const DeletionModal = ({habit, modalVisible, setModalVisibility}: Deletio
   const [error, setError] = useState<string | null>(null);
 
   // Delete Habit
-  const handleDeleteHabit = (habit: Habit) => {
+  const handleDeleteHabit = async (habit: Habit) => {
     if (!session?.user) {
       setError('Must be logged in to delete a habit.');
       return;
     }
     setModalVisibility(false);
-    deleteHabit(session, habit.id);
+    const ret = await deleteHabit(session, habit.id);
+
+    if (ret?.error) {
+      setError(ret.error);
+      console.error(ret.error);
+    }
   }
 
   return (
