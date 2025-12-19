@@ -3,7 +3,6 @@ import { supabase } from '../../utils/supabase'
 import { useSession } from '../../contexts/SessionContext';
 import { Habit } from '../../types/habit'
 import Dropdown from 'react-native-input-select';
-import { Picker } from '@react-native-picker/picker'
 import { Text } from 'react-native';
 import { fetchHabits } from '../../services/habitServices';
 
@@ -14,11 +13,6 @@ interface SelectHabitProps {
   refreshTrigger?: number; // Trigger refresh when this value changes
 }
 
-interface PickerItemProps {
-  label: string;
-  value: number;
-}
-
 export const SelectHabit = ({ setSelected, refreshTrigger }: SelectHabitProps) => {
   const { session } = useSession();
   const [ dropdownOpts, setDropdownOpts ] = useState<{label:string; value:number;}[]>([]);
@@ -26,6 +20,13 @@ export const SelectHabit = ({ setSelected, refreshTrigger }: SelectHabitProps) =
   const [ error, setError ] = useState<string | null>(null);
 
   const fetchOptions = useCallback(async () => {
+    if (!session?.user) {
+      const err = 'Need to be logged in to create a goal.';
+      setError(err);
+      console.error(err);
+      return;
+    }
+
     const ret = await fetchHabits(session);
     if (ret.error) {
       setError(ret.error);
@@ -65,33 +66,8 @@ export const SelectHabit = ({ setSelected, refreshTrigger }: SelectHabitProps) =
     };
   }, [session?.user, fetchOptions]);
 
-  const PickerItem = ({ label, value }: PickerItemProps) => {
-    return (
-      <Picker.Item label={label} value={value}/>
-    )
-  }
-
   return (
     <>
-      {/* <Picker
-        selectedValue={selectedOpt}
-        onValueChange={(val:number) => {
-          setSelectedOpt(val as number);
-          setSelected(val as number);
-        }}
-        placeholder='Select a habit...'
-        style={{
-            backgroundColor: '#171717',
-            borderColor: '#404040',
-            color: '#fff',
-            fontSize: 16,
-            borderWidth: 1,
-            borderRadius: 8,
-            minHeight: 48,
-            paddingHorizontal: 16,
-        }}>
-        { dropdownOpts.map((o) => (<PickerItem label={o.label} value={o.value}/>))}
-      </Picker> */}
       <Dropdown
         placeholder='Select a habit...'
         options={dropdownOpts}
