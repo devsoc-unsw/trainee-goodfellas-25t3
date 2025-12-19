@@ -78,6 +78,14 @@ export async function updateGoal(
   if (!goal) {
     return { error: "Couldn't retrieve the original data."};
   }
+  // using completed || goal.hours_completed can cause issues setting completed to 0 bc 0 is falsy
+  if (completed === undefined) {
+    completed = goal.hours_completed;
+  }
+  if (completed !== undefined && completed < 0) {
+    // completed can be < 0 if decremented
+    completed = 0;
+  }
 
   const updated = {
     id: goal.id,
@@ -85,7 +93,7 @@ export async function updateGoal(
     name: name || goal.name,
     description: description || goal.description || null,
     hours_required: goal.hours_required,
-    hours_completed: completed || goal.hours_completed,
+    hours_completed: completed,
     habit_id: habitId || goal.habit_id
   };
 
