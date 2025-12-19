@@ -32,7 +32,7 @@ export const DeletionModal = ({habit, modalVisible, setModalVisibility}: Deletio
       onRequestClose={() => setModalVisibility(false)}>
         {/* FIXME: i'm trying to center this in the screen but modal is really finicky */}
         <View
-          className="flex flex-col justify-center p-8 bg-gray-800 border border-t border-gray-700 rounded-lg h-max mx-10 mt-36">
+          className="flex flex-col justify-center p-8 bg-gray-800 border border-t border-gray-700 rounded-2xl h-max mx-10 mt-36">
           <Text className="text-white text-lg font-semibold">Are you sure you want to delete {habit.name}?</Text>
           <View className="flex flex-row gap-4 justify-around align-center mt-4 w-max">
             <TouchableOpacity
@@ -46,6 +46,11 @@ export const DeletionModal = ({habit, modalVisible, setModalVisibility}: Deletio
             </TouchableOpacity>
           </View>
         </View>
+        {error && (
+            <View className="bg-red-900/20 border border-red-500 rounded-lg p-3 mb-4">
+              <Text className="text-red-400">{error}</Text>
+            </View>
+          )}
     </Modal>
   )
 }
