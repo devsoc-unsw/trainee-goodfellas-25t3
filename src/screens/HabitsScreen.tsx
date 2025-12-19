@@ -1,4 +1,4 @@
-import { Text, View, TouchableOpacity, FlatList, ActivityIndicator, Button } from 'react-native';
+import { Text, View, TouchableOpacity, FlatList, ActivityIndicator, Button, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -6,9 +6,15 @@ import { Habit } from '../types/habit';
 import { HabitsStackParamList } from '../navigation/AppNavigator';
 import { useHabitsData } from '../hooks/useHabitsData';
 import { useState } from "react";
+import { DeletionModal } from '../components/goals/DeletionModal';
 
 export const HabitsScreen = () => {
   const [selectedHabitId, setSelectedHabitId] = useState<number | null>(null);
+  const [modalVisible, setModalVisibility] = useState(false);
+
+  function toggleModal() {
+    setModalVisibility(!modalVisible);
+  }
 
   /**
    * Use our custom hook to get habits data
@@ -39,11 +45,6 @@ export const HabitsScreen = () => {
         </View>
       </SafeAreaView>
     );
-  }
-
-  // Delete Habit
-  const deleteHabit = (habit: Habit) => {
-    alert("delete the habit");
   }
 
   // Edit Habit
@@ -106,11 +107,12 @@ export const HabitsScreen = () => {
                       <Text className="text-yellow-400 font-semibold text-center">Edit Habit</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      onPress={() => deleteHabit(item)}
+                      onPress={() => toggleModal()}
                       className="bg-red-600/20 border border-red-500/30 rounded-xl px-5 py-3 flex-auto"
                     >
                       <Text className="text-red-400 font-semibold text-center">Delete Habit</Text>
                     </TouchableOpacity>
+                    <DeletionModal habit={item} modalVisible={modalVisible} setModalVisibility={setModalVisibility}/>
                   </View>
                 )}
               </TouchableOpacity>
