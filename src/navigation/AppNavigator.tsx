@@ -9,6 +9,7 @@ import { SettingsScreen } from '../screens/SettingsScreen';
 import { TimerScreen } from '../screens/TimerScreen';
 import { HabitsScreen } from '../screens/HabitsScreen';
 import { SingleHabitScreen } from '../screens/SingleHabitScreen';
+import { EditHabitScreen } from '../screens/EditHabitScreen';
 import { Habit } from '../types/habit';
 
 export type RootTabParamList = {
@@ -21,6 +22,7 @@ export type RootTabParamList = {
 export type HabitsStackParamList = {
   HabitsList: undefined; 
   SingleHabit: { habit: Habit };
+  EditHabit: { habit: Habit };
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -65,6 +67,11 @@ const HabitsStack = () => (
       name="SingleHabit"
       component={SingleHabitScreen}
       options={{ title: 'Habit Details' }}
+    />
+    <Stack.Screen
+      name="EditHabit"
+      component={EditHabitScreen}
+      options={{ title: 'Edit Habit' }}
     />
   </Stack.Navigator>
 );

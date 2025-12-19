@@ -48,7 +48,7 @@ export const HabitsScreen = () => {
 
   // Edit Habit
   const editHabit = (habit: Habit) => {
-    alert("edit the habit");
+    navigation.navigate('EditHabit', { habit });
   }
 
   return(
