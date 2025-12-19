@@ -65,12 +65,13 @@ export const EditHabitScreen = ({ route }: EditHabitScreenProps) => {
                 <Text className="text-gray-500 text-sm">Uh oh...</Text>
               </View>
             ) : (
-              <View>
-                <Text className="text-3xl font-bold text-white text-center mb-10">
-                  Edit "{habit.name}"
+              <View className="bg-gray-800 rounded-lg p-6 w-full">
+                <Text className="text-2xl font-bold text-white text-center mb-8">
+                  ✍️ Edit your Habit "{habit.name}"
                 </Text>
 
-                <View className="flex flex-col gap-4">
+                <View className="flex flex-col gap-4 items-start">
+                  <Text className="text-gray-400 text-center text-base max-w-[80%]">Habit Name:</Text>
                   <TextInput
                     className="w-72 h-12 px-4 rounded-lg bg-neutral-900 text-white border border-neutral-700"
                     placeholder="Habit Name"
@@ -78,6 +79,7 @@ export const EditHabitScreen = ({ route }: EditHabitScreenProps) => {
                     value={name}
                     onChangeText={setName}
                   />
+                  <Text className="text-gray-400 text-center text-base max-w-[80%]">Habit Description:</Text>
                   <TextInput
                     className="w-72 h-12 px-4 rounded-lg bg-neutral-900 text-white border border-neutral-700"
                     placeholder="Description (optional)"
@@ -85,11 +87,13 @@ export const EditHabitScreen = ({ route }: EditHabitScreenProps) => {
                     value={description}
                     onChangeText={setDescription}
                   />
-                  <Button
-                    title={loading ? "Creating..." : "Create Habit"}
-                    onPress={handleEditHabit}
-                    disabled={loading}
-                  />
+                  <View className="w-full">
+                    <Button
+                      title={loading ? "Creating..." : "Create Habit"}
+                      onPress={handleEditHabit}
+                      disabled={loading}
+                    />
+                  </View>
                 </View>
               </View>
             )}
