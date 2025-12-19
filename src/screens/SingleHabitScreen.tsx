@@ -30,7 +30,6 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
     fetchGoals();
   }, [session]);
 
-  // TODO: No refresh functionality - need to add pull-to-refresh or manual refresh button
   async function fetchGoals() {
     if (!session?.user) {
       setError('Must be logged in to fetch goals.')
@@ -62,7 +61,7 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
   }
 
   const displayGoalProgressGraph = (goal: Goal) => {
-    const value = 100; // TODO: update this
+    const value = goal.hours_completed;
     const max = goal.hours_required;
     const percent = Math.round((value / max) * 100);
 
