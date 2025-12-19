@@ -15,7 +15,6 @@ export const DeletionModal = ({habit, modalVisible, setModalVisibility}: Deletio
   const [error, setError] = useState<string | null>(null);
 
   // Delete Habit
-  // TODO: move this into a deletion modal componbetn
   const handleDeleteHabit = (habit: Habit) => {
     if (!session?.user) {
       setError('Must be logged in to delete a habit.');
@@ -25,24 +24,27 @@ export const DeletionModal = ({habit, modalVisible, setModalVisibility}: Deletio
     deleteHabit(session, habit.id);
   }
 
-  // TODO: make this not ugly
   return (
     <Modal
-      animationType='fade'
+      animationType="slide"
       transparent={true}
       visible={modalVisible}
       onRequestClose={() => setModalVisibility(false)}>
-        <View className="mt-4 p-4 flex flex-row gap-2 border-t border-gray-700/50 w-max">
-        {/* TODO: fix the colors here lol */}
-          <TouchableOpacity
-              onPress={() => setModalVisibility(false)}
-              className="bg-yellow-600/20 border border-yellow-500/30 rounded-xl px-5 py-3 flex-auto"
-            ><Text className="text-yellow-400 font-semibold text-center">Cancel</Text></TouchableOpacity>
-          <TouchableOpacity
-              onPress={() => handleDeleteHabit(habit)}
-              className="bg-red-600/20 border border-red-500/30 rounded-xl px-5 py-3 flex-auto">
-            <Text className="text-red-400 font-semibold text-center">Delete</Text>
-          </TouchableOpacity>
+        {/* FIXME: i'm trying to center this in the screen but modal is really finicky */}
+        <View
+          className="flex flex-col justify-center p-8 bg-gray-800 border border-t border-gray-700 rounded-lg h-max mx-10 mt-36">
+          <Text className="text-white text-lg font-semibold">Are you sure you want to delete {habit.name}?</Text>
+          <View className="flex flex-row gap-4 justify-around align-center mt-4 w-max">
+            <TouchableOpacity
+                onPress={() => setModalVisibility(false)}
+                className="bg-neutral-300/20 border border-neutral-50/30 rounded-xl px-5 py-3 flex-auto"
+              ><Text className="text-white font-semibold text-center">Cancel</Text></TouchableOpacity>
+            <TouchableOpacity
+                onPress={() => handleDeleteHabit(habit)}
+                className="bg-red-600/20 border border-red-500/30 rounded-xl px-5 py-3 flex-auto">
+              <Text className="text-red-400 font-semibold text-center">Delete</Text>
+            </TouchableOpacity>
+          </View>
         </View>
     </Modal>
   )
