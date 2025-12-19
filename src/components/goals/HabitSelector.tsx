@@ -3,7 +3,7 @@ import { supabase } from '../../utils/supabase'
 import { useSession } from '../../contexts/SessionContext';
 import { Habit } from '../../types/habit'
 import Dropdown from 'react-native-input-select';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { fetchHabits } from '../../services/habitServices';
 
 // used for the dropdown to select a habit in goals menu
@@ -67,6 +67,7 @@ export const SelectHabit = ({ setSelected, refreshTrigger }: SelectHabitProps) =
   }, [session?.user, fetchOptions]);
 
   return (
+    // TODO: replace this with a better dropdown
     <>
       <Dropdown
         placeholder='Select a habit...'
@@ -77,38 +78,37 @@ export const SelectHabit = ({ setSelected, refreshTrigger }: SelectHabitProps) =
           setSelected(value as number);
         }}
         primaryColor={'#3b82f6'}
-        dropdownStyle={{
-          backgroundColor: '#171717',
-          borderColor: '#404040',
-          borderWidth: 1,
-          borderRadius: 8,
-          minHeight: 48,
-          paddingHorizontal: 16,
-        }}
         placeholderStyle={{
           color: '#888',
-          fontSize: 16,
+          fontSize: 14,
         }}
         selectedItemStyle={{
           color: '#fff',
           fontSize: 16,
         }}
         dropdownContainerStyle={{
-          backgroundColor: '#262626',
+          flexDirection: 'row',
+          alignContent: 'center',
+          backgroundColor: '#171717',
           borderColor: '#404040',
           borderRadius: 8,
+          borderWidth: 1,
+          height: 42,
+          paddingHorizontal: 16,
         }}
         listComponentStyles={{
           itemSeparatorStyle: {
             backgroundColor: '#404040',
           },
         }}
+        dropdownIcon={<Text className="text-white font-light text-xl">▼</Text>}
         dropdownIconStyle={{
-          width: 20,
-          height: 20,
+          top: 9,
+          right: 12,
         }}
-      />
-      {error && <Text style={{ color: '#ef4444', marginTop: 4 }}>{error}</Text>}
-    </>
+        autoCloseOnSelect={true}
+        />
+        {error && <Text style={{ color: '#ef4444', marginTop: 4 }}>{error}</Text>}
+      </>
   );
 }
