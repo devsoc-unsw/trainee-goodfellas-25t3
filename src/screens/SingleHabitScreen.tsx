@@ -4,7 +4,6 @@ import { Habit } from '../types/habit';
 import { Goal } from "../types/goal";
 import { useEffect, useState } from "react";
 import { useSession } from '../contexts/SessionContext';
-import { supabase } from '../utils/supabase';
 import { FlatList } from 'react-native-gesture-handler';
 import { Card } from "react-native-paper";
 import { EChartWrapper } from "../components/common/EChartWrapper"
@@ -114,7 +113,7 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
       itemId, undefined, undefined, undefined, hoursCompleted + parseInt(hours));
 
     if (ret?.error) {
-      console.error('Error:', ret.error);
+      setError(ret.error);
     }
     fetchGoals();
   }
@@ -124,7 +123,7 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
       itemId, undefined, undefined, undefined, hoursCompleted - parseInt(hours));
 
     if (ret?.error) {
-      console.error('Error:', ret.error);
+      setError(ret.error);
     }
     fetchGoals();
   }
@@ -181,8 +180,12 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
                             />
                             <Button title="Increase" onPress={() => incrementHours(inputs[item.id], item.hours_completed, item.id)} />
                             <Button title="Decrease" onPress={() => decrementHours(inputs[item.id], item.hours_completed, item.id)} />
+                            {error && (
+                              <View className="bg-red-900/20 border border-red-500 rounded-lg p-3 mb-4">
+                                <Text className="text-red-400">{error}</Text>
+                              </View>
+                            )}
                           </View>
-                          
                         </Card.Content>
                       </Card>
                     </View>
