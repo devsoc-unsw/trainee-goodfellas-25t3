@@ -48,8 +48,7 @@ export const EditHabitScreen = ({ route }: EditHabitScreenProps) => {
       setError(ret.error);
       console.error(error);
     } else {
-      setName(undefined);
-      setDescription(undefined);
+      console.log("Habit Edits Saved");
     }
   };
   
@@ -89,7 +88,7 @@ export const EditHabitScreen = ({ route }: EditHabitScreenProps) => {
                   />
                   <View className="w-full">
                     <Button
-                      title={loading ? "Editing..." : "Edit Habit"}
+                      title={loading ? "Saving..." : "Save Edits"}
                       onPress={handleEditHabit}
                       disabled={loading}
                     />
