@@ -4,9 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { EChartWrapper } from '../components/common/EChartWrapper';
 import { useHabitsData } from '../hooks/useHabitsData';
 import { Habit } from '../types/habit';
+import { RefreshControl } from 'react-native-gesture-handler';
+import { useSession } from '../contexts/SessionContext';
+import { fetchHabits } from '../services/habitServices';
 
 // TODO: Add goal progress tracking and recent activity feed
 export const DashboardScreen = () => {
+  const { session } = useSession();
   const [habits, setHabits] = useState<Habit[]>([]);
 
   /**
@@ -21,6 +25,20 @@ export const DashboardScreen = () => {
 
   // Color palette for charts (different colors for each habit)
   const colors = ['#1a7fe6', '#34d399', '#f472b6', '#fbbf24', '#a78bfa', '#fb923c'];
+
+  // used for manual refresh since supabase deletion doesn't work :(
+  async function handleFetchHabits() {
+    console.log('refreshing...'); // FIXME: remove this later but this isn't printing when i pull to refresh
+    if (!session?.user) {
+      return;
+    }
+    const ret = await fetchHabits(session);
+    if (ret?.habits) {
+      console.log(habits)
+      setHabits(ret.habits);
+      console.log(ret.habits)
+    }
+  }
 
   /**
    * Calculate statistics from habits data
@@ -135,7 +153,15 @@ export const DashboardScreen = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-[#030712]">
-      <ScrollView className="flex-1 p-6">
+      <ScrollView
+        className="flex-1 p-6"
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            // FIXME: i don't know why it wont work lol
+            onRefresh={() => handleFetchHabits}
+          />
+        }>
         {/* Header */}
         <View className="mb-6">
           <Text className="text-2xl font-bold text-white">Dashboard</Text>
