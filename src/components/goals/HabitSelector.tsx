@@ -103,7 +103,7 @@ export const SelectHabit = ({ setSelected, refreshTrigger }: SelectHabitProps) =
         }}
         dropdownIcon={<Text className="text-white font-light text-xl">▼</Text>}
         dropdownIconStyle={{
-          top: 9,
+          top: 6,
           right: 12,
         }}
         autoCloseOnSelect={true}
