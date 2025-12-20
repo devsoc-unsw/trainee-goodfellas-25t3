@@ -1,11 +1,14 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Text, View, ScrollView, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EChartWrapper } from '../components/common/EChartWrapper';
 import { useHabitsData } from '../hooks/useHabitsData';
+import { Habit } from '../types/habit';
 
 // TODO: Add goal progress tracking and recent activity feed
 export const DashboardScreen = () => {
+  const [habits, setHabits] = useState<Habit[]>([]);
+
   /**
    * Use our custom hook to get habits data
    * This hook handles:
@@ -14,7 +17,7 @@ export const DashboardScreen = () => {
    * - Handling errors
    * - Auto-refreshing when data changes
    */
-  const { habits, loading, error } = useHabitsData();
+  const { loading, error } = useHabitsData(setHabits);
 
   // Color palette for charts (different colors for each habit)
   const colors = ['#1a7fe6', '#34d399', '#f472b6', '#fbbf24', '#a78bfa', '#fb923c'];

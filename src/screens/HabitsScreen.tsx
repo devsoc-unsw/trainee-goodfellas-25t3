@@ -11,6 +11,7 @@ import { DeletionModal } from '../components/goals/DeletionModal';
 export const HabitsScreen = () => {
   const [selectedHabitId, setSelectedHabitId] = useState<number | null>(null);
   const [modalVisible, setModalVisibility] = useState(false);
+  const [habits, setHabits] = useState<Habit[]>([]);
 
   function toggleModal() {
     setModalVisibility(!modalVisible);
@@ -24,7 +25,7 @@ export const HabitsScreen = () => {
    * - Updates when habits change in database
    * - Handles loading and errors
    */
-  const { habits, loading, error } = useHabitsData();
+  const { loading, error } = useHabitsData(setHabits);
   
   // Get navigation so we can go to the single habit screen
   const navigation = useNavigation<NativeStackNavigationProp<HabitsStackParamList>>();

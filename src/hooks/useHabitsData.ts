@@ -21,11 +21,10 @@ import { useSession } from '../contexts/SessionContext';
 import { Habit } from '../types/habit';
 import { fetchHabits as fetchHabitsService } from '../services/habitServices';
 
-export function useHabitsData() {
+export function useHabitsData(setHabits: (h: Habit[]) => void) {
   const { session } = useSession();
-  
-  // State to store the list of habits
-  const [habits, setHabits] = useState<Habit[]>([]);
+
+  // list of habits state is updated through calling the setHabits func passed in
   
   // State to show loading spinner
   const [loading, setLoading] = useState(true);
@@ -116,7 +115,6 @@ export function useHabitsData() {
    * - refresh: Function to manually reload habits
    */
   return {
-    habits,
     loading,
     error,
     refresh: loadHabits,
