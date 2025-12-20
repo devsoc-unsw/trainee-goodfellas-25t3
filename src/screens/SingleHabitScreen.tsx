@@ -9,6 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HabitsStackParamList } from '../navigation/AppNavigator';
 import { DeletionModal } from '../components/goals/DeletionModal';
+import { useGoalsData } from '../hooks/useGoalsData';
 
 interface SingleHabitScreenProps {
   route?: {
@@ -22,17 +23,18 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
   const habit = route?.params?.habit;
   const { session } = useSession();
   const [goals, setGoals] = useState<Goal[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
   const [customHours, setCustomHours] = useState<Record<number, string>>({});
   const [modalVisible, setModalVisibility] = useState(false);
 
-  const navigation = useNavigation<NativeStackNavigationProp<HabitsStackParamList>>();
-
+  // uses the hook to refresh on goal creation/edit
+  // sorry this is so sketchy, i wanted the habits to refresh on delete
+  const { loading, error } = useGoalsData(setGoals, habit?.id);
   useEffect(() => {
     fetchGoals();
   }, [session]);
+
+  const navigation = useNavigation<NativeStackNavigationProp<HabitsStackParamList>>();
 
   function toggleModal() {
     // refresh goals when the modal is closed
@@ -42,20 +44,15 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
     setModalVisibility(!modalVisible)
   }
 
+  // used to manually refresh on goal deletion
   async function fetchGoals() {
     if (!session?.user || !habit?.id) {
-      setError('Must be logged in to fetch goals.');
       return;
     }
-
-    setLoading(true);
     const ret = await getGoals(habit.id);
-    if (ret?.error) {
-      setError(ret.error);
-    } else if (ret?.goals) {
+    if (ret?.goals) {
       setGoals(ret.goals);
     }
-    setLoading(false);
   }
 
   // Update hours with custom or preset amount
@@ -63,11 +60,8 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
     const newHours = Math.max(0, currentHours + amount); // Prevent negative hours
     const ret = await updateGoal(goalId, undefined, undefined, undefined, newHours);
     if (ret?.error) {
-      setError(ret.error);
     } else {
-      setError(null);
       setCustomHours(prev => ({ ...prev, [goalId]: '' })); // Clear input after success
-      fetchGoals();
     }
   };
 
