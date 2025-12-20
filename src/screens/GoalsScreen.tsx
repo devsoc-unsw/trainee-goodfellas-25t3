@@ -16,7 +16,6 @@ interface Goal {
   habits: { name: string } | null;
 }
 
-// TODO: New UI - feel free to modify
 export const GoalsScreen = () => {
   const [activeTab, setActiveTab] = useState<TabType>('habits');
   const [goals, setGoals] = useState<Goal[]>([]);

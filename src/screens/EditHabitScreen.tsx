@@ -16,7 +16,6 @@ interface EditHabitScreenProps {
 export const EditHabitScreen = ({ route }: EditHabitScreenProps) => {
   const habit = route?.params?.habit;
   const { session } = useSession()
-  // name and desc are allowed to be undefined, the user can choose to update one or the other
   const [name, setName] = useState<string>();
   const [description, setDescription] = useState<string>();
   const [loading, setLoading] = useState(false);
