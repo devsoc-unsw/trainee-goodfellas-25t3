@@ -75,6 +75,9 @@ export async function updateHabit(
   if (!habit) {
     return { error: "Couldn't retrieve the original data." };
   }
+  if (!name && !description) {
+    return { error: 'Must provide either a name or a description.'}
+  }
 
   const updated = {
     id: habit.id,
