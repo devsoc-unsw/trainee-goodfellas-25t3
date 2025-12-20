@@ -5,6 +5,9 @@ import { Goal } from "../types/goal";
 import { useEffect, useState, useMemo } from "react";
 import { useSession } from '../contexts/SessionContext';
 import { fetchGoals as getGoals, updateGoal } from '../services/goalServices';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { HabitsStackParamList } from '../navigation/AppNavigator';
 
 interface SingleHabitScreenProps {
   route?: {
@@ -22,6 +25,8 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
   const [error, setError] = useState<string | null>(null);
   const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
   const [customHours, setCustomHours] = useState<Record<number, string>>({});
+
+  const navigation = useNavigation<NativeStackNavigationProp<HabitsStackParamList>>();
 
   useEffect(() => {
     fetchGoals();
@@ -93,6 +98,16 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
         </View>
       </SafeAreaView>
     );
+  }
+
+  // Edit Goal
+  const editGoal = (goal: Goal) => {
+    navigation.navigate('EditGoal', { goal });
+  }
+
+  // Delete Goal
+  const deleteGoal = (goal: Goal) => {
+    alert("TODO");
   }
 
   return (
@@ -247,6 +262,20 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
                       >
                         <Text className="text-red-400 font-semibold text-center">- 1 Hour</Text>
                       </TouchableOpacity>
+                      <View className="flex-row gap-2 mt-2">
+                        <TouchableOpacity
+                          onPress={() => editGoal(goal)}
+                          className="bg-yellow-600/20 border border-yellow-500/30 rounded-xl px-3 py-3 flex-auto"
+                        >
+                          <Text className="text-yellow-400 font-semibold text-center">Edit Goal</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => deleteGoal(goal)}
+                          className="bg-red-600/20 border border-red-500/30 rounded-xl px-3 py-3 flex-auto"
+                        >
+                          <Text className="text-red-400 font-semibold text-center">Delete Goal</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
                   )}
                 </View>

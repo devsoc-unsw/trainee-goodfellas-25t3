@@ -11,6 +11,8 @@ import { HabitsScreen } from '../screens/HabitsScreen';
 import { SingleHabitScreen } from '../screens/SingleHabitScreen';
 import { EditHabitScreen } from '../screens/EditHabitScreen';
 import { Habit } from '../types/habit';
+import { EditGoalScreen } from '../screens/EditGoalScreen';
+import { Goal } from '../types/goal';
 
 export type RootTabParamList = {
   HomePage: undefined;
@@ -23,6 +25,7 @@ export type HabitsStackParamList = {
   HabitsList: undefined; 
   SingleHabit: { habit: Habit };
   EditHabit: { habit: Habit };
+  EditGoal: { goal: Goal };
 };
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -72,6 +75,11 @@ const HabitsStack = () => (
       name="EditHabit"
       component={EditHabitScreen}
       options={{ title: 'Edit Habit' }}
+    />
+    <Stack.Screen
+      name="EditGoal"
+      component={EditGoalScreen}
+      options={{ title: 'Edit Goal' }}
     />
   </Stack.Navigator>
 );
