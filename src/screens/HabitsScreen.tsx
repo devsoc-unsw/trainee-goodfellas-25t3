@@ -91,8 +91,7 @@ export const HabitsScreen = () => {
                   </Text>
                   <TouchableOpacity 
                     onPress={() => setSelectedHabitId(isSelected ? null : item.id)}
-                    // FIXME: this renders too tall if the habit has a description
-                    className="bg-gray-700 active:bg-gray-600 rounded-xl px-4 py-3 self-center"
+                    className="bg-gray-700 active:bg-gray-600 rounded-xl px-4 py-3 self-start"
                   >
                     <Text className="text-white text-center font-semibold text-base">
                       {isSelected ? '✕' : '···'}
