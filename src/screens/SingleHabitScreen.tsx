@@ -36,10 +36,10 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
 
   const navigation = useNavigation<NativeStackNavigationProp<HabitsStackParamList>>();
 
-  function toggleModal() {
+  async function toggleModal() {
     // refresh goals when the modal is closed
     if (modalVisible) {
-      fetchGoals();
+      await fetchGoals();
     }
     setModalVisibility(!modalVisible)
   }

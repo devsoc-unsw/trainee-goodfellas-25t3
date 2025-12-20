@@ -50,9 +50,7 @@ export const HabitsScreen = () => {
   async function toggleModal() {
     if (modalVisible) {
       // refresh when deletion complete
-      console.log('yoski')
       await handleFetchHabits();
-      console.log('im done')
     }
     setModalVisibility(!modalVisible);
   }
