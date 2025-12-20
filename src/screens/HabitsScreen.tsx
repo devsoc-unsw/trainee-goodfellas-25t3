@@ -115,9 +115,9 @@ export const HabitsScreen = () => {
                       </TouchableOpacity>
                     </View>
                     <DeletionModal
-                      habit={item}
+                      toDelete={item}
                       modalVisible={modalVisible}
-                      setModalVisibility={setModalVisibility}/>
+                      toggleModal={toggleModal}/>
                   </View>
                 )}
               </TouchableOpacity>

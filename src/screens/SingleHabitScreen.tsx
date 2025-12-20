@@ -8,6 +8,7 @@ import { fetchGoals as getGoals, updateGoal } from '../services/goalServices';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HabitsStackParamList } from '../navigation/AppNavigator';
+import { DeletionModal } from '../components/goals/DeletionModal';
 
 interface SingleHabitScreenProps {
   route?: {
@@ -25,12 +26,21 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
   const [error, setError] = useState<string | null>(null);
   const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
   const [customHours, setCustomHours] = useState<Record<number, string>>({});
+  const [modalVisible, setModalVisibility] = useState(false);
 
   const navigation = useNavigation<NativeStackNavigationProp<HabitsStackParamList>>();
 
   useEffect(() => {
     fetchGoals();
   }, [session]);
+
+  function toggleModal() {
+    // refresh goals when the modal is closed
+    if (modalVisible) {
+      fetchGoals();
+    }
+    setModalVisibility(!modalVisible)
+  }
 
   async function fetchGoals() {
     if (!session?.user || !habit?.id) {
@@ -103,11 +113,6 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
   // Edit Goal
   const editGoal = (goal: Goal) => {
     navigation.navigate('EditGoal', { goal });
-  }
-
-  // Delete Goal
-  const deleteGoal = (goal: Goal) => {
-    alert("TODO");
   }
 
   return (
@@ -270,12 +275,16 @@ export const SingleHabitScreen = ({ route }: SingleHabitScreenProps) => {
                           <Text className="text-yellow-400 font-semibold text-center">Edit Goal</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                          onPress={() => deleteGoal(goal)}
+                          onPress={() => toggleModal()}
                           className="bg-red-600/20 border border-red-500/30 rounded-xl px-3 py-3 flex-auto"
                         >
                           <Text className="text-red-400 font-semibold text-center">Delete Goal</Text>
                         </TouchableOpacity>
                       </View>
+                      <DeletionModal
+                        toDelete={goal}
+                        modalVisible={modalVisible}
+                        toggleModal={toggleModal}/>
                     </View>
                   )}
                 </View>

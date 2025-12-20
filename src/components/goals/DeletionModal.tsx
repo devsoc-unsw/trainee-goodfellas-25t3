@@ -3,24 +3,37 @@ import { Habit } from '../../types/habit';
 import { useState } from "react";
 import { deleteHabit } from '../../services/habitServices';
 import { useSession } from '../../contexts/SessionContext';
+import { Goal } from '../../types/goal';
 
 interface DeletionModalProps {
-  habit: Habit;
+  toDelete: Habit|Goal;
   modalVisible: boolean;
-  setModalVisibility: (value: boolean) => void;
+  toggleModal: () => void;
 }
 
-export const DeletionModal = ({habit, modalVisible, setModalVisibility}: DeletionModalProps) => {
+export const DeletionModal = ({toDelete, modalVisible, toggleModal}: DeletionModalProps) => {
   const { session } = useSession();
   const [error, setError] = useState<string | null>(null);
 
-  // Delete Habit
+  const handleDeletion = async (target: Goal | Habit) => {
+    // used to check type first
+    const isGoal = (target: Goal | Habit): target is Goal => {
+      return (target as Goal).hours_required !== undefined
+    }
+
+    if (isGoal(target)) {
+      handleDeleteGoal(target);
+    } else {
+      handleDeleteHabit(target);
+    }
+  }
+
   const handleDeleteHabit = async (habit: Habit) => {
     if (!session?.user) {
       setError('Must be logged in to delete a habit.');
       return;
     }
-    setModalVisibility(false);
+    toggleModal();
     const ret = await deleteHabit(session, habit.id);
 
     if (ret?.error) {
@@ -29,23 +42,29 @@ export const DeletionModal = ({habit, modalVisible, setModalVisibility}: Deletio
     }
   }
 
+  const handleDeleteGoal = async (goal: Goal) => {
+    // TODO: implement
+    console.log('finish this');
+    toggleModal()
+  }
+
   return (
     <Modal
       animationType="slide"
       transparent={true}
       visible={modalVisible}
-      onRequestClose={() => setModalVisibility(false)}>
+      onRequestClose={() => toggleModal()}>
         {/* FIXME: i'm trying to center this in the screen but modal is really finicky */}
         <View
           className="flex flex-col justify-center p-8 bg-gray-800 border border-t border-gray-700 rounded-2xl h-max mx-10 mt-36">
-          <Text className="text-white text-lg font-semibold">Are you sure you want to delete {habit.name}?</Text>
+          <Text className="text-white text-lg font-semibold">Are you sure you want to delete {toDelete.name}?</Text>
           <View className="flex flex-row gap-4 justify-around align-center mt-4 w-max">
             <TouchableOpacity
-                onPress={() => setModalVisibility(false)}
+                onPress={() => toggleModal()}
                 className="bg-neutral-300/20 border border-neutral-50/30 rounded-xl px-5 py-3 flex-auto"
               ><Text className="text-white font-semibold text-center">Cancel</Text></TouchableOpacity>
             <TouchableOpacity
-                onPress={() => handleDeleteHabit(habit)}
+                onPress={() => handleDeletion(toDelete)}
                 className="bg-red-600/20 border border-red-500/30 rounded-xl px-5 py-3 flex-auto">
               <Text className="text-red-400 font-semibold text-center">Delete</Text>
             </TouchableOpacity>
