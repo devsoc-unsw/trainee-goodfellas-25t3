@@ -1,10 +1,9 @@
-import { Text, View, ActivityIndicator, TextInput, ScrollView, TouchableOpacity, Button } from 'react-native';
+import { Text, View, ActivityIndicator, TextInput, ScrollView, Button } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Habit } from '../types/habit';
 import { useEffect, useState } from "react";
 import { useSession } from '../contexts/SessionContext';
-import { updateHabit } from '../services/habitServices';
 import { Goal } from '../types/goal';
+import { updateGoal } from '../services/goalServices';
 
 interface EditGoalScreenProps {
   route?: {
@@ -41,18 +40,17 @@ export const EditGoalScreen = ({ route }: EditGoalScreenProps) => {
     setLoading(true);
     setError(null);
 
-    // const ret = await updateHabit(session, goal.id, name, description);
-    // TODO: instead of update habit, update goal!
-    alert("TODO!");
+    // allow user to edit name and desc
+    const ret = await updateGoal(goal.id, name, description, goal.habit_id, goal.hours_completed);
 
     setLoading(false);
 
-    // if (ret?.error) {
-    //   setError(ret.error);
-    //   console.error(error);
-    // } else {
-    //   console.log("Goal Edits Saved");
-    // }
+    if (ret?.error) {
+      setError(ret.error);
+      console.error(error);
+    } else {
+      console.log("Goal Edits Saved");
+    }
   };
   
   return (
