@@ -4,6 +4,7 @@ import { useState } from "react";
 import { deleteHabit } from '../../services/habitServices';
 import { useSession } from '../../contexts/SessionContext';
 import { Goal } from '../../types/goal';
+import { deleteGoal } from '../../services/goalServices';
 
 interface DeletionModalProps {
   toDelete: Habit|Goal;
@@ -31,6 +32,7 @@ export const DeletionModal = ({toDelete, modalVisible, toggleModal}: DeletionMod
   const handleDeleteHabit = async (habit: Habit) => {
     if (!session?.user) {
       setError('Must be logged in to delete a habit.');
+      console.error(error);
       return;
     }
     toggleModal();
@@ -43,9 +45,18 @@ export const DeletionModal = ({toDelete, modalVisible, toggleModal}: DeletionMod
   }
 
   const handleDeleteGoal = async (goal: Goal) => {
-    // TODO: implement
-    console.log('finish this');
-    toggleModal()
+    if (!session?.user) {
+      setError('Must be logged in to delete a habit.');
+      console.error(error);
+      return;
+    }
+    const ret = await deleteGoal(goal.id);
+    toggleModal();
+
+    if (ret?.error) {
+      setError(ret.error);
+      console.error(ret.error);
+    }
   }
 
   return (
