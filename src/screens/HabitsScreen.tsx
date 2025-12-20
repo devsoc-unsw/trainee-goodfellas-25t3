@@ -7,15 +7,14 @@ import { HabitsStackParamList } from '../navigation/AppNavigator';
 import { useHabitsData } from '../hooks/useHabitsData';
 import { useState } from "react";
 import { DeletionModal } from '../components/goals/DeletionModal';
+import { useSession } from '../contexts/SessionContext';
+import { fetchHabits } from '../services/habitServices';
 
 export const HabitsScreen = () => {
+  const { session } = useSession();
   const [selectedHabitId, setSelectedHabitId] = useState<number | null>(null);
   const [modalVisible, setModalVisibility] = useState(false);
   const [habits, setHabits] = useState<Habit[]>([]);
-
-  function toggleModal() {
-    setModalVisibility(!modalVisible);
-  }
 
   /**
    * Use our custom hook to get habits data
@@ -29,6 +28,17 @@ export const HabitsScreen = () => {
   
   // Get navigation so we can go to the single habit screen
   const navigation = useNavigation<NativeStackNavigationProp<HabitsStackParamList>>();
+
+  // called when deletion occurs, to ensure the list actually refreshes
+  async function handleFetchHabits() {
+    if (!session?.user) {
+      return;
+    }
+    const ret = await fetchHabits(session);
+    if (ret?.habits) {
+      setHabits(ret.habits);
+    }
+  }
   
   /**
    * Function to navigate to a single habit's detail page
@@ -36,6 +46,17 @@ export const HabitsScreen = () => {
   function redirectToHabitScreen(habit: Habit) {
     navigation.navigate('SingleHabit', { habit });
   }
+ 
+  async function toggleModal() {
+    if (modalVisible) {
+      // refresh when deletion complete
+      console.log('yoski')
+      await handleFetchHabits();
+      console.log('im done')
+    }
+    setModalVisibility(!modalVisible);
+  }
+
 
   if (loading) {
     return (
