@@ -22,6 +22,11 @@ export const EditHabitScreen = ({ route }: EditHabitScreenProps) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    setName(habit?.name || "");
+    setDescription(habit?.description || "");
+  }, []);
+
   const handleEditHabit = async () => {
     if (!session?.user) {
       setError('Must be logged in to edit a habit.');
@@ -84,7 +89,7 @@ export const EditHabitScreen = ({ route }: EditHabitScreenProps) => {
                   />
                   <View className="w-full">
                     <Button
-                      title={loading ? "Creating..." : "Create Habit"}
+                      title={loading ? "Editing..." : "Edit Habit"}
                       onPress={handleEditHabit}
                       disabled={loading}
                     />
