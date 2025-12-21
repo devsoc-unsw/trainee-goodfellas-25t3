@@ -28,15 +28,12 @@ export const DashboardScreen = () => {
 
   // used for manual refresh since supabase deletion doesn't work :(
   async function handleFetchHabits() {
-    console.log('refreshing...'); // FIXME: remove this later but this isn't printing when i pull to refresh
     if (!session?.user) {
       return;
     }
     const ret = await fetchHabits(session);
     if (ret?.habits) {
-      console.log(habits)
       setHabits(ret.habits);
-      console.log(ret.habits)
     }
   }
 
@@ -159,7 +156,7 @@ export const DashboardScreen = () => {
           <RefreshControl
             refreshing={loading}
             // FIXME: i don't know why it wont work lol
-            onRefresh={() => handleFetchHabits}
+            onRefresh={handleFetchHabits}
           />
         }>
         {/* Header */}
