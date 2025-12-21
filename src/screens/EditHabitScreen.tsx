@@ -89,7 +89,7 @@ export const EditHabitScreen = ({ route }: EditHabitScreenProps) => {
                     <TouchableOpacity
                       onPress={handleEditHabit}
                       disabled={loading}
-                      className={`mt-6 rounded-xl px-4 py-3 ${
+                      className={`mt-2 rounded-xl px-4 py-3 ${
                         loading
                           ? 'bg-blue-400'
                           : 'bg-blue-600 active:bg-blue-700'
