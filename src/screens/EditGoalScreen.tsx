@@ -1,4 +1,4 @@
-import { Text, View, ActivityIndicator, TextInput, ScrollView, Button } from 'react-native';
+import { Text, View, ActivityIndicator, TextInput, ScrollView, TouchableOpacity} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useState } from "react";
 import { useSession } from '../contexts/SessionContext';
@@ -88,11 +88,21 @@ export const EditGoalScreen = ({ route }: EditGoalScreenProps) => {
                     onChangeText={setDescription}
                   />
                   <View className="w-full">
-                    <Button
-                      title={loading ? "Saving..." : "Save Edits"}
+                    <TouchableOpacity
                       onPress={handleEditGoal}
                       disabled={loading}
-                    />
+                      className={`mt-2 rounded-xl px-4 py-3 ${
+                        loading
+                          ? 'bg-blue-400'
+                          : 'bg-blue-600 active:bg-blue-700'
+                          }`}
+                        >
+                      <Text
+                        className="text-white text-center font-semibold"
+                        >
+                      {loading ? 'Saving...': 'Save Edits'}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
