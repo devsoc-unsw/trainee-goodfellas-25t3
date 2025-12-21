@@ -86,11 +86,21 @@ export const EditHabitScreen = ({ route }: EditHabitScreenProps) => {
                     onChangeText={setDescription}
                   />
                   <View className="w-full">
-                    <Button
-                      title={loading ? "Saving..." : "Save Edits"}
+                    <TouchableOpacity
                       onPress={handleEditHabit}
                       disabled={loading}
-                    />
+                      className={`mt-6 rounded-xl px-4 py-3 ${
+                        loading
+                          ? 'bg-blue-400'
+                          : 'bg-blue-600 active:bg-blue-700'
+                          }`}
+                        >
+                      <Text
+                        className="text-white text-center font-semibold"
+                        >
+                      {loading ? 'Saving...': 'Save Edits'}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
