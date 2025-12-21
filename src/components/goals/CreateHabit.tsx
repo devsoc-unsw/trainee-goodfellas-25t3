@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, TextInput, View, Text } from 'react-native';
+import { TouchableOpacity, TextInput, View, Text } from 'react-native';
 import { useSession } from '../../contexts/SessionContext';
 import { createHabit } from '../../services/habitServices';
 
@@ -48,11 +48,21 @@ export const CreateHabit = () => {
         value={description}
         onChangeText={setDesc}
       />
-      <Button
-        title={loading ? "Creating..." : "Create Habit"}
+      <TouchableOpacity
         onPress={handleCreateHabit}
         disabled={loading}
-      />
+        className={`mt-2 rounded-xl px-4 py-3 ${
+          loading
+            ? 'bg-blue-400'
+            : 'bg-blue-600 active:bg-blue-700'
+            }`}
+          >
+        <Text
+          className="text-white text-center font-semibold"
+          >
+        {loading ? 'Creating...': 'Create Habit'}
+        </Text>
+      </TouchableOpacity>
       {error && <Text className='text-red-500'>{error}</Text>}
     </View>
   )
